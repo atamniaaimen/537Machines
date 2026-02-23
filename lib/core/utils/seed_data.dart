@@ -60,8 +60,8 @@ class SeedData {
         year: 2019,
         hours: 4200,
         imageUrls: [
-          'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800',
-          'https://images.unsplash.com/photo-1504222490345-c075b6008014?w=800',
+          'https://picsum.photos/seed/cnc1/800/600',
+          'https://picsum.photos/seed/cnc2/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 2)),
         updatedAt: now.subtract(const Duration(days: 2)),
@@ -84,8 +84,8 @@ class SeedData {
         year: 2017,
         hours: 6800,
         imageUrls: [
-          'https://images.unsplash.com/photo-1580901368919-7738efb0f228?w=800',
-          'https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=800',
+          'https://picsum.photos/seed/dozer1/800/600',
+          'https://picsum.photos/seed/dozer2/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 5)),
         updatedAt: now.subtract(const Duration(days: 5)),
@@ -108,7 +108,7 @@ class SeedData {
         year: 2018,
         hours: 5400,
         imageUrls: [
-          'https://images.unsplash.com/photo-1578328819058-b69f3a3ef1ce?w=800',
+          'https://picsum.photos/seed/excavator1/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 1)),
         updatedAt: now.subtract(const Duration(days: 1)),
@@ -130,7 +130,7 @@ class SeedData {
         model: 'Power MIG 256',
         year: 2024,
         imageUrls: [
-          'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800',
+          'https://picsum.photos/seed/welder1/800/600',
         ],
         createdAt: now.subtract(const Duration(hours: 6)),
         updatedAt: now.subtract(const Duration(hours: 6)),
@@ -153,8 +153,8 @@ class SeedData {
         year: 2020,
         hours: 2100,
         imageUrls: [
-          'https://images.unsplash.com/photo-1562408590-e32931084e23?w=800',
-          'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800',
+          'https://picsum.photos/seed/lathe1/800/600',
+          'https://picsum.photos/seed/lathe2/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 3)),
         updatedAt: now.subtract(const Duration(days: 3)),
@@ -177,7 +177,7 @@ class SeedData {
         year: 2016,
         hours: 4800,
         imageUrls: [
-          'https://images.unsplash.com/photo-1586191582151-f32b5961daef?w=800',
+          'https://picsum.photos/seed/backhoe1/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 7)),
         updatedAt: now.subtract(const Duration(days: 7)),
@@ -200,7 +200,7 @@ class SeedData {
         year: 2021,
         hours: 3200,
         imageUrls: [
-          'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800',
+          'https://picsum.photos/seed/compressor1/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 4)),
         updatedAt: now.subtract(const Duration(days: 4)),
@@ -223,7 +223,7 @@ class SeedData {
         year: 2018,
         hours: 7600,
         imageUrls: [
-          'https://images.unsplash.com/photo-1562408590-e32931084e23?w=800',
+          'https://picsum.photos/seed/mazak1/800/600',
         ],
         createdAt: now.subtract(const Duration(days: 10)),
         updatedAt: now.subtract(const Duration(days: 10)),
