@@ -2,9 +2,9 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Development: allow all reads/writes for authenticated users
+    // Development: allow all reads/writes (open for testing)
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
     }
   }
 }
