@@ -7,12 +7,20 @@ import '../../../app/app.router.dart';
 import '../../../core/error_handling/executor.dart';
 import '../../../core/services/crashlytics_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../core/utils/seed_data.dart';
 
 class StartupViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
 
   Future<void> init() async {
     await Future.delayed(const Duration(seconds: 1));
+
+    // Seed mock data (runs once, skips if already seeded)
+    try {
+      await SeedData.seed();
+    } catch (e) {
+      debugPrint('Seed data failed: $e');
+    }
 
     // On web with placeholder Firebase config, skip auth entirely
     if (kIsWeb) {

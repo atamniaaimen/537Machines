@@ -110,8 +110,8 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  entry.value,
+                                child: Image.memory(
+                                  viewModel.pickedImageBytes[entry.key],
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.cover,

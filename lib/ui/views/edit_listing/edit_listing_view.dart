@@ -135,8 +135,8 @@ class EditListingView extends StackedView<EditListingViewModel> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(6),
-                              child: Image.file(
-                                entry.value,
+                              child: Image.memory(
+                                viewModel.newImageBytes[entry.key],
                                 width: 64,
                                 height: 64,
                                 fit: BoxFit.cover,

@@ -59,11 +59,11 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
                 onTap: viewModel.pickAvatar,
                 child: Column(
                   children: [
-                    if (viewModel.pickedAvatar != null)
+                    if (viewModel.pickedAvatarBytes != null)
                       CircleAvatar(
                         radius: 50,
                         backgroundImage:
-                            FileImage(viewModel.pickedAvatar!),
+                            MemoryImage(viewModel.pickedAvatarBytes!),
                       )
                     else
                       AvatarWidget(

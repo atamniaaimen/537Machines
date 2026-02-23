@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../core/error_handling/failures/general_failure.dart';
 import '../core/error_handling/failures/data_failure.dart';
@@ -11,18 +11,15 @@ class StorageRepository {
 
   Future<String> uploadFile({
     required String path,
-    required File file,
+    required Uint8List bytes,
   }) async {
     try {
       final ref = _storage.ref().child(path);
-      await ref.putFile(file);
+      await ref.putData(bytes);
       return await ref.getDownloadURL();
     } on FirebaseException catch (e, s) {
       throw DataFailure(DataFailureType.uploadFailed,
           description: '${e.code}: ${e.message}', stackTrace: s);
-    } on SocketException catch (e, s) {
-      throw GeneralFailure(
-          GeneralFailureType.socketException, e.toString(), s);
     } catch (e, s) {
       throw GeneralFailure(
           GeneralFailureType.unexpectedError, e.toString(), s);
@@ -35,9 +32,6 @@ class StorageRepository {
     } on FirebaseException catch (e, s) {
       throw DataFailure(DataFailureType.deleteFailed,
           description: '${e.code}: ${e.message}', stackTrace: s);
-    } on SocketException catch (e, s) {
-      throw GeneralFailure(
-          GeneralFailureType.socketException, e.toString(), s);
     } catch (e, s) {
       throw GeneralFailure(
           GeneralFailureType.unexpectedError, e.toString(), s);
@@ -51,9 +45,6 @@ class StorageRepository {
     } on FirebaseException catch (e, s) {
       throw DataFailure(DataFailureType.requestFailed,
           description: '${e.code}: ${e.message}', stackTrace: s);
-    } on SocketException catch (e, s) {
-      throw GeneralFailure(
-          GeneralFailureType.socketException, e.toString(), s);
     } catch (e, s) {
       throw GeneralFailure(
           GeneralFailureType.unexpectedError, e.toString(), s);

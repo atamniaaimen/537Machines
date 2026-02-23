@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -27,8 +27,11 @@ class EditListingViewModel extends BaseViewModel {
   MachineListing? _listing;
   MachineListing? get listing => _listing;
 
-  final List<File> _newImages = [];
-  List<File> get newImages => _newImages;
+  final List<XFile> _newImages = [];
+  List<XFile> get newImages => _newImages;
+
+  final List<Uint8List> _newImageBytes = [];
+  List<Uint8List> get newImageBytes => _newImageBytes;
 
   List<String> _existingImageUrls = [];
   List<String> get existingImageUrls => _existingImageUrls;
@@ -97,7 +100,8 @@ class EditListingViewModel extends BaseViewModel {
     );
 
     if (image != null) {
-      _newImages.add(File(image.path));
+      _newImages.add(image);
+      _newImageBytes.add(await image.readAsBytes());
       rebuildUi();
     }
   }
@@ -109,6 +113,7 @@ class EditListingViewModel extends BaseViewModel {
 
   void removeNewImage(int index) {
     _newImages.removeAt(index);
+    _newImageBytes.removeAt(index);
     rebuildUi();
   }
 

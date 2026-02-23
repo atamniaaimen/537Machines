@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -21,8 +21,11 @@ class EditProfileViewModel extends BaseViewModel {
 
   AppUser? get currentUser => _authService.currentUser;
 
-  File? _pickedAvatar;
-  File? get pickedAvatar => _pickedAvatar;
+  XFile? _pickedAvatar;
+  XFile? get pickedAvatar => _pickedAvatar;
+
+  Uint8List? _pickedAvatarBytes;
+  Uint8List? get pickedAvatarBytes => _pickedAvatarBytes;
 
   Future<void> pickAvatar() async {
     final picker = ImagePicker();
@@ -34,7 +37,8 @@ class EditProfileViewModel extends BaseViewModel {
     );
 
     if (image != null) {
-      _pickedAvatar = File(image.path);
+      _pickedAvatar = image;
+      _pickedAvatarBytes = await image.readAsBytes();
       rebuildUi();
     }
   }

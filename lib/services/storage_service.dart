@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:image_picker/image_picker.dart' show XFile;
 import 'package:logger/logger.dart';
 import '../app/app.locator.dart';
 import '../core/error_handling/executor.dart';
@@ -11,7 +11,7 @@ class StorageService {
   final _crashlytics = locator<CrashlyticsService>();
 
   Future<List<String>> uploadListingImages({
-    required List<File> files,
+    required List<XFile> files,
     required String userId,
     required String listingId,
   }) async {
@@ -20,10 +20,11 @@ class StorageService {
     for (int i = 0; i < files.length; i++) {
       final path =
           '${FirebaseConstants.machineImagesPath}/$userId/$listingId/image_$i.jpg';
+      final bytes = await files[i].readAsBytes();
 
       await Executor.run(_storageRepo.uploadFile(
         path: path,
-        file: files[i],
+        bytes: bytes,
       )).then((result) => result.fold(
             (failure) {
               _crashlytics.logToCrashlytics(
@@ -88,14 +89,15 @@ class StorageService {
   }
 
   Future<String> uploadAvatar({
-    required File file,
+    required XFile file,
     required String userId,
-  }) {
+  }) async {
     final path = '${FirebaseConstants.avatarImagesPath}/$userId/avatar.jpg';
+    final bytes = await file.readAsBytes();
 
     return Executor.run(_storageRepo.uploadFile(
       path: path,
-      file: file,
+      bytes: bytes,
     )).then((result) => result.fold(
           (failure) {
             _crashlytics.logToCrashlytics(

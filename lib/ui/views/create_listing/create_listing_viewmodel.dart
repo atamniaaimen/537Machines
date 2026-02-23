@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:logger/logger.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -20,8 +20,11 @@ class CreateListingViewModel extends BaseViewModel {
   final _snackbarService = locator<SnackbarService>();
   final _crashlytics = locator<CrashlyticsService>();
 
-  final List<File> _pickedImages = [];
-  List<File> get pickedImages => _pickedImages;
+  final List<XFile> _pickedImages = [];
+  List<XFile> get pickedImages => _pickedImages;
+
+  final List<Uint8List> _pickedImageBytes = [];
+  List<Uint8List> get pickedImageBytes => _pickedImageBytes;
 
   String? _selectedCategory;
   String? get selectedCategory => _selectedCategory;
@@ -57,13 +60,15 @@ class CreateListingViewModel extends BaseViewModel {
     );
 
     if (image != null) {
-      _pickedImages.add(File(image.path));
+      _pickedImages.add(image);
+      _pickedImageBytes.add(await image.readAsBytes());
       rebuildUi();
     }
   }
 
   void removeImage(int index) {
     _pickedImages.removeAt(index);
+    _pickedImageBytes.removeAt(index);
     rebuildUi();
   }
 
