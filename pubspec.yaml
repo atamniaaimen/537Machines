@@ -1,0 +1,49 @@
+name: machine_marketplace
+description: "537 Machines - Industrial Machine Marketplace"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Stacked MVVM
+  stacked: ^3.4.3
+  stacked_services: ^1.6.0
+  get_it: ^8.0.0
+
+  # Functional error handling
+  dartz: ^0.10.1
+
+  # Logging
+  logger: ^2.0.0
+
+  # Firebase
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+  firebase_storage: ^12.0.0
+
+  # Auth
+  google_sign_in: ^6.2.1
+
+  # UI
+  cached_network_image: ^3.3.1
+  carousel_slider: ^5.0.0
+  image_picker: ^1.0.7
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.0
+  stacked_generator: ^1.6.0
+
+flutter:
+  uses-material-design: true

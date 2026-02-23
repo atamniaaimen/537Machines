@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>537 Machines — Marketplace App</title>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #2ECC71;
+  --green-light: #A3E4B8;
+  --green-dark: #1A9B4F;
+  --green-pale: #E8F8EF;
+  --dark: #2D3436;
+  --darker: #1A1D22;
+  --darkest: #0F1114;
+  --white: #FFFFFF;
+  --gray-50: #FAFBFB;
+  --gray-100: #F0F3F2;
+  --gray-150: #E8ECEB;
+  --gray-200: #DFE6E9;
+  --gray-300: #B2BEC3;
+  --gray-400: #7F8C8D;
+  --gray-500: #636E72;
+  --danger: #E74C3C;
+  --warning: #F39C12;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--gray-100);
+  color: var(--dark);
+  font-family: 'Titillium Web', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ===== NAV TABS (page switcher for demo) ===== */
+.demo-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-150);
+  padding: 10px 16px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.demo-nav::-webkit-scrollbar { display:none; }
+
+.demo-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Titillium Web';
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-500);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.demo-tab:hover { border-color: var(--green-light); color: var(--green-dark); }
+.demo-tab.active { background: var(--green); color: var(--white); border-color: var(--green); }
+
+/* ===== PAGE CONTAINER ===== */
+.page { display: none; padding-top: 56px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ===== SHARED: LOGO ===== */
+.logo {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  height: 36px;
+  flex-shrink: 0;
+}
+.logo .l-g {
+  background: var(--green);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+.logo .l-g span {
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--darkest);
+  letter-spacing: -0.5px;
+}
+.logo .l-d {
+  background: var(--dark);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+.logo .l-d span {
+  font-weight: 700;
+  font-size: 6px;
+  color: var(--white);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.logo.lg { height: 56px; border-radius: var(--radius-md); }
+.logo.lg .l-g { padding: 0 16px; }
+.logo.lg .l-g span { font-size: 26px; }
+.logo.lg .l-d { padding: 0 12px; }
+.logo.lg .l-d span { font-size: 8px; letter-spacing: 2px; }
+
+/* ===== SHARED: BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Titillium Web';
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}
+.btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--green-dark);
+  border-color: var(--green);
+}
+.btn-outline:hover { background: var(--green-pale); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--gray-500);
+  border-color: var(--gray-200);
+}
+.btn-ghost:hover { border-color: var(--gray-300); color: var(--dark); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-danger:hover { background: #FDEDEC; }
+
+.btn-full { width: 100%; }
+.btn-sm { padding: 8px 16px; font-size: 12px; }
+.btn-lg { padding: 14px 32px; font-size: 16px; }
+
+/* ===== SHARED: INPUT FIELDS ===== */
+.field { margin-bottom: 20px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Titillium Web';
+  font-size: 15px;
+  color: var(--dark);
+  background: var(--white);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46,204,113,0.1);
+}
+.field input::placeholder, .field textarea::placeholder {
+  color: var(--gray-300);
+}
+.field textarea { resize: vertical; min-height: 100px; }
+
+/* ===== SHARED: MACHINE CARD ===== */
+.machine-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--gray-150);
+  transition: all 0.25s;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.machine-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  border-color: var(--green-light);
+}
+.machine-card .mc-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--gray-100);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.machine-card .mc-img .mc-placeholder {
+  font-size: 40px;
+  opacity: 0.15;
+}
+.machine-card .mc-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.mc-badge.new { background: var(--green-pale); color: var(--green-dark); }
+.mc-badge.used { background: #FEF3E2; color: #E67E22; }
+.mc-badge.refurb { background: #EBF5FB; color: #2980B9; }
+
+.machine-card .mc-body { padding: 16px; }
+.machine-card .mc-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--dark);
+  margin-bottom: 6px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.machine-card .mc-price {
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--green-dark);
+  margin-bottom: 8px;
+}
+.machine-card .mc-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--gray-400);
+  font-weight: 300;
+}
+.machine-card .mc-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* ===== SHARED: BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--gray-150);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 12px;
+  z-index: 900;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+}
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 4px 12px;
+  transition: color 0.2s;
+  letter-spacing: 0.5px;
+}
+.bnav-item:hover { color: var(--green-dark); }
+.bnav-item.active { color: var(--green-dark); }
+.bnav-item .bnav-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.bnav-item.active .bnav-icon {
+  background: var(--green-pale);
+  border-radius: 8px;
+  width: 40px;
+}
+
+/* ===== SHARED: SPINNER ===== */
+.spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 0;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.spinner-text {
+  font-size: 13px;
+  color: var(--gray-400);
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== SHARED: TOP BAR ===== */
+.topbar {
+  background: var(--white);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gray-150);
+  position: sticky;
+  top: 56px;
+  z-index: 100;
+}
+.topbar-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--dark);
+}
+.topbar-back {
+  font-size: 20px;
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--dark); }
+
+/* ===== SHARED: SECTION ===== */
+.content-pad { padding: 20px; padding-bottom: 80px; max-width: 900px; margin: 0 auto; }
+.content-wide { padding: 20px; padding-bottom: 80px; max-width: 1200px; margin: 0 auto; }
+
+/* ===== SHARED: OVERLAY / DIALOG ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.dialog {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.dialog .dialog-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--green-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+}
+.dialog h3 {
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.dialog p {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.dialog .dialog-btns { display: flex; gap: 12px; }
+
+/* ===== SHARED: BOTTOM SHEET ===== */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.bottom-sheet {
+  background: var(--white);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  animation: sheetUp 0.3s ease;
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  margin: 0 auto 20px;
+}
+.sheet-title {
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--dark);
+  margin-bottom: 20px;
+}
+
+/* ===== SHARED: CAROUSEL ===== */
+.carousel {
+  position: relative;
+  background: var(--gray-100);
+  aspect-ratio: 16/10;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel .car-placeholder { font-size: 64px; opacity: 0.1; }
+.carousel .car-dots {
+  position: absolute;
+  bottom: 16px;
+  display: flex;
+  gap: 6px;
+}
+.carousel .car-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+  opacity: 0.5;
+}
+.carousel .car-dot.active { opacity: 1; width: 24px; border-radius: 4px; }
+.carousel .car-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--dark);
+  box-shadow: var(--shadow-sm);
+}
+.carousel .car-nav.prev { left: 12px; }
+.carousel .car-nav.next { right: 12px; }
+
+/* ===== SHARED: AVATAR ===== */
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--green-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--green-dark);
+  flex-shrink: 0;
+}
+.avatar.sm { width: 44px; height: 44px; font-size: 16px; }
+.avatar.lg { width: 100px; height: 100px; font-size: 36px; }
+
+/* ===== SHARED: TAGS ===== */
+.tag {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.tag-green { background: var(--green-pale); color: var(--green-dark); }
+
+/* ===== SHARED: DIVIDER ===== */
+.sep { height: 1px; background: var(--gray-150); margin: 20px 0; }
+
+/* ===== IMAGE UPLOAD AREA ===== */
+.upload-area {
+  border: 2px dashed var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--gray-50);
+}
+.upload-area:hover { border-color: var(--green-light); background: var(--green-pale); }
+.upload-area .up-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.3; }
+.upload-area .up-text { font-size: 14px; color: var(--gray-400); }
+.upload-area .up-hint { font-size: 12px; color: var(--gray-300); margin-top: 4px; }
+
+/* ===== PRICE RANGE ===== */
+.range-row { display: flex; gap: 12px; align-items: center; }
+.range-row .range-dash { color: var(--gray-300); font-weight: 300; }
+
+/* ===== CARD GROUP ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* ===== AUTH PAGES ===== */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-50);
+  padding: 20px;
+}
+.auth-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-150);
+}
+.auth-card .auth-logo { text-align: center; margin-bottom: 32px; }
+.auth-card .auth-title {
+  font-weight: 900;
+  font-size: 26px;
+  color: var(--dark);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.auth-card .auth-sub {
+  font-size: 14px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: 300;
+}
+.auth-card .auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+.auth-card .auth-footer a {
+  color: var(--green-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  font-size: 12px;
+  color: var(--gray-300);
+  letter-spacing: 1px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+/* ===== SELLER CARD ===== */
+.seller-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-150);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.seller-card .sc-info { flex: 1; }
+.seller-card .sc-name { font-weight: 700; font-size: 15px; color: var(--dark); }
+.seller-card .sc-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+/* ===== PROFILE HEADER ===== */
+.profile-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-150);
+  padding: 32px 20px;
+  text-align: center;
+}
+.profile-header .ph-name { font-weight: 900; font-size: 24px; margin-top: 16px; color: var(--dark); }
+.profile-header .ph-email { font-size: 13px; color: var(--gray-400); font-weight: 300; margin-top: 4px; }
+.profile-header .ph-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 20px;
+}
+.profile-header .ph-stat { text-align: center; }
+.profile-header .ph-stat .ps-num { font-weight: 900; font-size: 22px; color: var(--green-dark); }
+.profile-header .ph-stat .ps-label { font-size: 11px; color: var(--gray-400); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+/* ===== DETAIL SPECS ===== */
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.spec-item {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-150);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+.spec-item .sp-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.spec-item .sp-val { font-weight: 700; font-size: 15px; color: var(--dark); margin-top: 2px; }
+
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.search-bar input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Titillium Web';
+  font-size: 15px;
+  color: var(--dark);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,204,113,0.1); }
+.search-bar .filter-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+.search-bar .filter-btn:hover { border-color: var(--green); color: var(--green-dark); }
+
+/* ===== SECTION LABEL ===== */
+.section-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding-top: 8px;
+}
+
+/* ===== IMAGE THUMB ROW ===== */
+.thumb-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.thumb-item {
+  width: 64px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  opacity: 0.3;
+  cursor: pointer;
+}
+.thumb-item.active { border-color: var(--green); opacity: 1; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .auth-card { padding: 32px 24px; }
+  .content-pad, .content-wide { padding: 16px; padding-bottom: 80px; }
+  .specs-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== DEMO PAGE SWITCHER ===== -->
+<nav class="demo-nav">
+  <button class="demo-tab active" onclick="showPage('login')">Login</button>
+  <button class="demo-tab" onclick="showPage('register')">Register</button>
+  <button class="demo-tab" onclick="showPage('home')">Listings Home</button>
+  <button class="demo-tab" onclick="showPage('detail')">Listing Detail</button>
+  <button class="demo-tab" onclick="showPage('create')">Create Listing</button>
+  <button class="demo-tab" onclick="showPage('edit')">Edit Listing</button>
+  <button class="demo-tab" onclick="showPage('profile')">Profile</button>
+  <button class="demo-tab" onclick="showPage('editprofile')">Edit Profile</button>
+  <button class="demo-tab" onclick="showPage('filter')">Filter Sheet</button>
+  <button class="demo-tab" onclick="showPage('confirm')">Confirmation</button>
+  <button class="demo-tab" onclick="showPage('components')">Components</button>
+</nav>
+
+<!-- ============================================================ -->
+<!-- PAGE 1: LOGIN                                                 -->
+<!-- ============================================================ -->
+<div id="page-login" class="page active">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo lg" style="margin:0 auto;">
+          <div class="l-g"><span>537</span></div>
+          <div class="l-d"><span>MACHINES</span></div>
+        </div>
+      </div>
+      <div class="auth-title">Welcome Back</div>
+      <div class="auth-sub">Sign in to access your marketplace</div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="you@company.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••">
+      </div>
+      <div style="text-align:right; margin:-12px 0 20px;">
+        <a href="#" style="font-size:12px; color:var(--green-dark); text-decoration:none; font-weight:600;">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button class="btn btn-ghost btn-full">Continue with Google</button>
+      <div class="auth-footer">Don't have an account? <a href="#">Register</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 2: REGISTER                                              -->
+<!-- ============================================================ -->
+<div id="page-register" class="page">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo lg" style="margin:0 auto;">
+          <div class="l-g"><span>537</span></div>
+          <div class="l-d"><span>MACHINES</span></div>
+        </div>
+      </div>
+      <div class="auth-title">Create Account</div>
+      <div class="auth-sub">Join the industrial marketplace</div>
+      <div style="display:flex; gap:12px;">
+        <div class="field" style="flex:1;">
+          <label>First Name</label>
+          <input type="text" placeholder="John">
+        </div>
+        <div class="field" style="flex:1;">
+          <label>Last Name</label>
+          <input type="text" placeholder="Smith">
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="you@company.com">
+      </div>
+      <div class="field">
+        <label>Company</label>
+        <input type="text" placeholder="Your company name">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Min. 8 characters">
+      </div>
+      <button class="btn btn-primary btn-full btn-lg">Create Account</button>
+      <div class="auth-divider">or</div>
+      <button class="btn btn-ghost btn-full">Continue with Google</button>
+      <div class="auth-footer">Already have an account? <a href="#">Sign In</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 3: LISTINGS HOME                                         -->
+<!-- ============================================================ -->
+<div id="page-home" class="page">
+  <div class="topbar">
+    <div class="logo">
+      <div class="l-g"><span>537</span></div>
+      <div class="l-d"><span>MACHINES</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:18px; cursor:pointer;">🔔</span>
+      <div class="avatar sm">JS</div>
+    </div>
+  </div>
+
+  <div class="content-wide">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-weight:900; font-size:28px; color:var(--dark); margin-bottom:4px;">Browse Machines</h1>
+      <p style="font-size:14px; color:var(--gray-400); font-weight:300;">1,247 machines available worldwide</p>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Search machines, brands, models...">
+      <div class="filter-btn">⚙</div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;">
+      <span class="tag tag-green">All</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">CNC</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">Lathe</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">Milling</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">Drilling</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">Welding</span>
+      <span class="tag" style="background:var(--gray-100); color:var(--gray-500);">Press</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🏭</span><span class="mc-badge new">New</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Haas VF-2SS CNC Vertical Mill</div>
+          <div class="mc-price">$89,500</div>
+          <div class="mc-meta"><span>📍 Detroit, MI</span><span>2024</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">⚙️</span><span class="mc-badge used">Used</span></div>
+        <div class="mc-body">
+          <div class="mc-title">DMG Mori NLX 2500 CNC Lathe</div>
+          <div class="mc-price">$124,000</div>
+          <div class="mc-meta"><span>📍 Chicago, IL</span><span>2021</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🔧</span><span class="mc-badge refurb">Refurb</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Mazak Quick Turn 250 MSY</div>
+          <div class="mc-price">$67,200</div>
+          <div class="mc-meta"><span>📍 Houston, TX</span><span>2019</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🏗️</span><span class="mc-badge new">New</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Trumpf TruLaser 3030 Fiber</div>
+          <div class="mc-price">$215,000</div>
+          <div class="mc-meta"><span>📍 Atlanta, GA</span><span>2024</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🔩</span><span class="mc-badge used">Used</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Okuma LB3000 EX II CNC Lathe</div>
+          <div class="mc-price">$95,800</div>
+          <div class="mc-meta"><span>📍 Dallas, TX</span><span>2020</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">⚡</span><span class="mc-badge refurb">Refurb</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Amada HFE 220-4 Press Brake</div>
+          <div class="mc-price">$42,500</div>
+          <div class="mc-meta"><span>📍 Phoenix, AZ</span><span>2018</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active"><div class="bnav-icon">🏠</div>Home</div>
+    <div class="bnav-item"><div class="bnav-icon">🔍</div>Search</div>
+    <div class="bnav-item"><div class="bnav-icon">➕</div>Sell</div>
+    <div class="bnav-item"><div class="bnav-icon">💬</div>Messages</div>
+    <div class="bnav-item"><div class="bnav-icon">👤</div>Profile</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 4: LISTING DETAIL                                        -->
+<!-- ============================================================ -->
+<div id="page-detail" class="page">
+  <div class="topbar">
+    <span class="topbar-back">←</span>
+    <span class="topbar-title">Listing Detail</span>
+    <span style="font-size:18px; cursor:pointer;">♡</span>
+  </div>
+
+  <div class="carousel">
+    <span class="car-placeholder">🏭</span>
+    <div class="car-nav prev">‹</div>
+    <div class="car-nav next">›</div>
+    <div class="car-dots">
+      <div class="car-dot active"></div>
+      <div class="car-dot"></div>
+      <div class="car-dot"></div>
+      <div class="car-dot"></div>
+    </div>
+  </div>
+
+  <div class="content-pad">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:4px;">
+      <span class="mc-badge new" style="position:static;">New</span>
+      <span style="font-size:12px; color:var(--gray-400);">Listed 3 days ago</span>
+    </div>
+    <h1 style="font-weight:900; font-size:24px; color:var(--dark); margin:12px 0 8px; line-height:1.3;">Haas VF-2SS CNC Vertical Machining Center</h1>
+    <div style="font-weight:900; font-size:32px; color:var(--green-dark); margin-bottom:20px;">$89,500</div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Specifications</div>
+    <div class="specs-grid" style="margin-bottom:24px;">
+      <div class="spec-item"><div class="sp-label">Brand</div><div class="sp-val">Haas</div></div>
+      <div class="spec-item"><div class="sp-label">Model</div><div class="sp-val">VF-2SS</div></div>
+      <div class="spec-item"><div class="sp-label">Year</div><div class="sp-val">2024</div></div>
+      <div class="spec-item"><div class="sp-label">Condition</div><div class="sp-val">New</div></div>
+      <div class="spec-item"><div class="sp-label">Location</div><div class="sp-val">Detroit, MI</div></div>
+      <div class="spec-item"><div class="sp-label">Hours</div><div class="sp-val">0</div></div>
+    </div>
+
+    <div class="section-label">Description</div>
+    <p style="font-size:14px; color:var(--gray-500); line-height:1.8; margin-bottom:24px;">
+      Brand new Haas VF-2SS Super Speed vertical machining center. Features a 12,000 RPM inline direct-drive spindle, 1,400 IPM rapids, and high-speed machining software. Includes through-spindle coolant, programmable coolant nozzle, and 24+1 side-mount tool changer. Full factory warranty included.
+    </p>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Seller</div>
+    <div class="seller-card" style="margin-bottom:24px;">
+      <div class="avatar sm">MP</div>
+      <div class="sc-info">
+        <div class="sc-name">Midwest Precision Tools</div>
+        <div class="sc-meta">⭐ 4.9 · 47 listings · Member since 2021</div>
+      </div>
+      <button class="btn btn-outline btn-sm">View</button>
+    </div>
+
+    <div style="display:flex; gap:12px;">
+      <button class="btn btn-primary btn-lg" style="flex:1;">Contact Seller</button>
+      <button class="btn btn-outline btn-lg">Share</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item"><div class="bnav-icon">🏠</div>Home</div>
+    <div class="bnav-item"><div class="bnav-icon">🔍</div>Search</div>
+    <div class="bnav-item"><div class="bnav-icon">➕</div>Sell</div>
+    <div class="bnav-item"><div class="bnav-icon">💬</div>Messages</div>
+    <div class="bnav-item"><div class="bnav-icon">👤</div>Profile</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 5: CREATE LISTING                                        -->
+<!-- ============================================================ -->
+<div id="page-create" class="page">
+  <div class="topbar">
+    <span class="topbar-back">←</span>
+    <span class="topbar-title">Create Listing</span>
+    <span></span>
+  </div>
+
+  <div class="content-pad">
+    <div class="section-label">Photos</div>
+    <div class="upload-area" style="margin-bottom:24px;">
+      <div class="up-icon">📷</div>
+      <div class="up-text">Tap to upload machine photos</div>
+      <div class="up-hint">JPG, PNG up to 10MB · Max 8 photos</div>
+    </div>
+
+    <div class="section-label">Machine Details</div>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" placeholder="e.g. Haas VF-2SS CNC Vertical Mill">
+    </div>
+    <div style="display:flex; gap:12px;">
+      <div class="field" style="flex:1;">
+        <label>Brand</label>
+        <input type="text" placeholder="e.g. Haas">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Model</label>
+        <input type="text" placeholder="e.g. VF-2SS">
+      </div>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <div class="field" style="flex:1;">
+        <label>Year</label>
+        <input type="number" placeholder="2024">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Condition</label>
+        <select>
+          <option>Select condition</option>
+          <option>New</option>
+          <option>Used</option>
+          <option>Refurbished</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Price (USD)</label>
+      <input type="number" placeholder="0.00">
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" placeholder="City, State">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea placeholder="Describe the machine's features, specifications, history..."></textarea>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select>
+        <option>Select category</option>
+        <option>CNC Machines</option>
+        <option>Lathes</option>
+        <option>Milling</option>
+        <option>Drilling</option>
+        <option>Welding</option>
+        <option>Press</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary btn-full btn-lg" style="margin-top:12px;">Publish Listing</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 6: EDIT LISTING                                          -->
+<!-- ============================================================ -->
+<div id="page-edit" class="page">
+  <div class="topbar">
+    <span class="topbar-back">←</span>
+    <span class="topbar-title">Edit Listing</span>
+    <span></span>
+  </div>
+
+  <div class="content-pad">
+    <div class="section-label">Photos</div>
+    <div class="thumb-row" style="margin-bottom:24px;">
+      <div class="thumb-item active">🏭</div>
+      <div class="thumb-item">⚙️</div>
+      <div class="thumb-item">🔧</div>
+      <div class="upload-area" style="width:64px; height:48px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:var(--radius-sm);">
+        <span style="font-size:18px; opacity:0.3;">+</span>
+      </div>
+    </div>
+
+    <div class="section-label">Machine Details</div>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" value="Haas VF-2SS CNC Vertical Mill">
+    </div>
+    <div style="display:flex; gap:12px;">
+      <div class="field" style="flex:1;">
+        <label>Brand</label>
+        <input type="text" value="Haas">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Model</label>
+        <input type="text" value="VF-2SS">
+      </div>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <div class="field" style="flex:1;">
+        <label>Year</label>
+        <input type="number" value="2024">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>Condition</label>
+        <select><option selected>New</option><option>Used</option><option>Refurbished</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Price (USD)</label>
+      <input type="number" value="89500">
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" value="Detroit, MI">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea>Brand new Haas VF-2SS Super Speed vertical machining center. Features a 12,000 RPM inline direct-drive spindle, 1,400 IPM rapids, and high-speed machining software.</textarea>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select><option selected>CNC Machines</option><option>Lathes</option><option>Milling</option></select>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:12px;">
+      <button class="btn btn-primary btn-lg" style="flex:1;">Save Changes</button>
+      <button class="btn btn-danger btn-lg">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 7: PROFILE                                               -->
+<!-- ============================================================ -->
+<div id="page-profile" class="page">
+  <div class="topbar">
+    <span class="topbar-back">←</span>
+    <span class="topbar-title">Profile</span>
+    <span style="font-size:16px; cursor:pointer;">⚙</span>
+  </div>
+
+  <div class="profile-header">
+    <div class="avatar lg" style="margin:0 auto;">JS</div>
+    <div class="ph-name">John Smith</div>
+    <div class="ph-email">john@midwestprecision.com</div>
+    <div class="ph-stats">
+      <div class="ph-stat"><div class="ps-num">12</div><div class="ps-label">Listings</div></div>
+      <div class="ph-stat"><div class="ps-num">47</div><div class="ps-label">Sales</div></div>
+      <div class="ph-stat"><div class="ps-num">4.9</div><div class="ps-label">Rating</div></div>
+    </div>
+    <button class="btn btn-outline btn-sm" style="margin-top:20px;">Edit Profile</button>
+  </div>
+
+  <div class="content-wide">
+    <div class="section-label" style="margin-top:8px;">My Listings</div>
+    <div class="card-grid">
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🏭</span><span class="mc-badge new">New</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Haas VF-2SS CNC Vertical Mill</div>
+          <div class="mc-price">$89,500</div>
+          <div class="mc-meta"><span>📍 Detroit, MI</span><span>Active</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">⚙️</span><span class="mc-badge used">Used</span></div>
+        <div class="mc-body">
+          <div class="mc-title">DMG Mori NLX 2500 CNC Lathe</div>
+          <div class="mc-price">$124,000</div>
+          <div class="mc-meta"><span>📍 Chicago, IL</span><span>Active</span></div>
+        </div>
+      </div>
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🔧</span><span class="mc-badge refurb">Refurb</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Mazak Quick Turn 250 MSY</div>
+          <div class="mc-price">$67,200</div>
+          <div class="mc-meta"><span>📍 Houston, TX</span><span>Sold</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item"><div class="bnav-icon">🏠</div>Home</div>
+    <div class="bnav-item"><div class="bnav-icon">🔍</div>Search</div>
+    <div class="bnav-item"><div class="bnav-icon">➕</div>Sell</div>
+    <div class="bnav-item"><div class="bnav-icon">💬</div>Messages</div>
+    <div class="bnav-item active"><div class="bnav-icon">👤</div>Profile</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 8: EDIT PROFILE                                          -->
+<!-- ============================================================ -->
+<div id="page-editprofile" class="page">
+  <div class="topbar">
+    <span class="topbar-back">←</span>
+    <span class="topbar-title">Edit Profile</span>
+    <span></span>
+  </div>
+
+  <div class="content-pad">
+    <div style="text-align:center; margin-bottom:32px; margin-top:12px;">
+      <div class="avatar lg" style="margin:0 auto; position:relative;">
+        JS
+      </div>
+      <a href="#" style="font-size:13px; color:var(--green-dark); text-decoration:none; font-weight:600; display:inline-block; margin-top:12px;">Change Photo</a>
+    </div>
+
+    <div class="field">
+      <label>First Name</label>
+      <input type="text" value="John">
+    </div>
+    <div class="field">
+      <label>Last Name</label>
+      <input type="text" value="Smith">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" value="john@midwestprecision.com">
+    </div>
+    <div class="field">
+      <label>Company</label>
+      <input type="text" value="Midwest Precision Tools">
+    </div>
+    <div class="field">
+      <label>Phone</label>
+      <input type="tel" value="+1 (555) 537-0000">
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" value="Detroit, MI">
+    </div>
+    <div class="field">
+      <label>Bio</label>
+      <textarea>Premium industrial equipment dealer specializing in CNC machines. Serving the Midwest since 2021.</textarea>
+    </div>
+
+    <button class="btn btn-primary btn-full btn-lg" style="margin-top:12px;">Save Profile</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 9: FILTER BOTTOM SHEET                                   -->
+<!-- ============================================================ -->
+<div id="page-filter" class="page">
+  <div class="topbar">
+    <div class="logo">
+      <div class="l-g"><span>537</span></div>
+      <div class="l-d"><span>MACHINES</span></div>
+    </div>
+    <span></span>
+  </div>
+
+  <div class="content-pad" style="text-align:center; padding-top:60px;">
+    <p style="color:var(--gray-400); margin-bottom:20px;">Tap below to open the filter sheet</p>
+    <button class="btn btn-primary btn-lg" onclick="document.getElementById('filter-sheet').style.display='flex'">Open Filters</button>
+  </div>
+
+  <div id="filter-sheet" class="sheet-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div class="sheet-title" style="margin-bottom:0;">Filters</div>
+        <a href="#" style="font-size:13px; color:var(--green-dark); text-decoration:none; font-weight:600;">Reset All</a>
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <select>
+          <option>All Categories</option>
+          <option>CNC Machines</option>
+          <option>Lathes</option>
+          <option>Milling</option>
+          <option>Drilling</option>
+          <option>Welding</option>
+          <option>Press</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Condition</label>
+        <select>
+          <option>Any Condition</option>
+          <option>New</option>
+          <option>Used</option>
+          <option>Refurbished</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Price Range</label>
+        <div class="range-row">
+          <input type="number" placeholder="Min" style="flex:1;">
+          <span class="range-dash">—</span>
+          <input type="number" placeholder="Max" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Year</label>
+        <div class="range-row">
+          <input type="number" placeholder="From" style="flex:1;">
+          <span class="range-dash">—</span>
+          <input type="number" placeholder="To" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <input type="text" placeholder="City, State or Zip">
+      </div>
+
+      <div class="field">
+        <label>Sort By</label>
+        <select>
+          <option>Newest First</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Closest</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button class="btn btn-primary btn-lg btn-full">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 10: CONFIRMATION DIALOG                                  -->
+<!-- ============================================================ -->
+<div id="page-confirm" class="page">
+  <div class="topbar">
+    <div class="logo">
+      <div class="l-g"><span>537</span></div>
+      <div class="l-d"><span>MACHINES</span></div>
+    </div>
+    <span></span>
+  </div>
+
+  <div class="content-pad" style="text-align:center; padding-top:60px;">
+    <p style="color:var(--gray-400); margin-bottom:20px;">Tap below to preview dialogs</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="document.getElementById('dlg-success').style.display='flex'">Success Dialog</button>
+      <button class="btn btn-danger" onclick="document.getElementById('dlg-delete').style.display='flex'">Delete Dialog</button>
+    </div>
+  </div>
+
+  <!-- Success Dialog -->
+  <div id="dlg-success" class="overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+    <div class="dialog">
+      <div class="dialog-icon">✓</div>
+      <h3>Listing Published!</h3>
+      <p>Your machine listing is now live and visible to buyers worldwide.</p>
+      <div class="dialog-btns">
+        <button class="btn btn-outline" style="flex:1;" onclick="document.getElementById('dlg-success').style.display='none'">View Listing</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="document.getElementById('dlg-success').style.display='none'">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Dialog -->
+  <div id="dlg-delete" class="overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+    <div class="dialog">
+      <div class="dialog-icon" style="background:#FDEDEC;">🗑️</div>
+      <h3>Delete Listing?</h3>
+      <p>This action cannot be undone. Your listing will be permanently removed from the marketplace.</p>
+      <div class="dialog-btns">
+        <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('dlg-delete').style.display='none'">Cancel</button>
+        <button class="btn btn-danger" style="flex:1;" onclick="document.getElementById('dlg-delete').style.display='none'">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 11: COMPONENTS SHOWCASE                                  -->
+<!-- ============================================================ -->
+<div id="page-components" class="page">
+  <div class="topbar">
+    <span class="topbar-title">Component Library</span>
+    <span></span>
+  </div>
+
+  <div class="content-pad">
+
+    <div class="section-label">Logo Variants</div>
+    <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:32px;">
+      <div class="logo lg"><div class="l-g"><span>537</span></div><div class="l-d"><span>MACHINES</span></div></div>
+      <div class="logo"><div class="l-g"><span>537</span></div><div class="l-d"><span>MACHINES</span></div></div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Buttons</div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px;">
+      <button class="btn btn-primary">Primary</button>
+      <button class="btn btn-outline">Outline</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-danger">Danger</button>
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Input Fields</div>
+    <div style="max-width:400px; margin-bottom:32px;">
+      <div class="field">
+        <label>Text Input</label>
+        <input type="text" placeholder="Enter text...">
+      </div>
+      <div class="field">
+        <label>Select</label>
+        <select><option>Choose option</option><option>Option A</option></select>
+      </div>
+      <div class="field">
+        <label>Textarea</label>
+        <textarea placeholder="Write something..."></textarea>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Machine Card</div>
+    <div style="max-width:300px; margin-bottom:32px;">
+      <div class="machine-card">
+        <div class="mc-img"><span class="mc-placeholder">🏭</span><span class="mc-badge new">New</span></div>
+        <div class="mc-body">
+          <div class="mc-title">Haas VF-2SS CNC Vertical Mill</div>
+          <div class="mc-price">$89,500</div>
+          <div class="mc-meta"><span>📍 Detroit, MI</span><span>2024</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Condition Badges</div>
+    <div style="display:flex; gap:8px; margin-bottom:32px;">
+      <span class="mc-badge new" style="position:static;">New</span>
+      <span class="mc-badge used" style="position:static;">Used</span>
+      <span class="mc-badge refurb" style="position:static;">Refurbished</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Avatars</div>
+    <div style="display:flex; gap:16px; align-items:center; margin-bottom:32px;">
+      <div class="avatar lg">JS</div>
+      <div class="avatar">JS</div>
+      <div class="avatar sm">JS</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Loading Spinner</div>
+    <div class="spinner-wrap">
+      <div class="spinner"></div>
+      <div class="spinner-text">Loading machines...</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="section-label">Bottom Navigation</div>
+    <div style="background:var(--white); border:1px solid var(--gray-150); border-radius:var(--radius-lg); overflow:hidden; max-width:400px;">
+      <div style="display:flex; justify-content:space-around; padding:8px 0 12px;">
+        <div class="bnav-item active"><div class="bnav-icon">🏠</div>Home</div>
+        <div class="bnav-item"><div class="bnav-icon">🔍</div>Search</div>
+        <div class="bnav-item"><div class="bnav-icon">➕</div>Sell</div>
+        <div class="bnav-item"><div class="bnav-icon">💬</div>Messages</div>
+        <div class="bnav-item"><div class="bnav-icon">👤</div>Profile</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PAGE SWITCHER SCRIPT ===== -->
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>
