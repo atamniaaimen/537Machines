@@ -154,8 +154,8 @@ class _FilterSheetState extends State<FilterSheet> {
                     hint: 'Min',
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text('—',
                       style: TextStyle(color: AppColors.gray400, fontSize: 16)),
                 ),
@@ -180,8 +180,8 @@ class _FilterSheetState extends State<FilterSheet> {
                     hint: 'From',
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text('—',
                       style: TextStyle(color: AppColors.gray400, fontSize: 16)),
                 ),

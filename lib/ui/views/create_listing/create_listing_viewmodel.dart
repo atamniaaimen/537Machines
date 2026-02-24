@@ -26,11 +26,47 @@ class CreateListingViewModel extends BaseViewModel {
   final List<Uint8List> _pickedImageBytes = [];
   List<Uint8List> get pickedImageBytes => _pickedImageBytes;
 
+  // Form values stored as plain strings (no Flutter imports)
+  String _title = '';
+  String _brand = '';
+  String _model = '';
+  String _year = '';
+  String _price = '';
+  String _location = '';
+  String _description = '';
+
   String? _selectedCategory;
   String? get selectedCategory => _selectedCategory;
 
   String? _selectedCondition;
   String? get selectedCondition => _selectedCondition;
+
+  bool _isNegotiable = false;
+  bool get isNegotiable => _isNegotiable;
+
+  bool _acceptsOffers = true;
+  bool get acceptsOffers => _acceptsOffers;
+
+  String _serialNumber = '';
+
+  void setTitle(String v) => _title = v;
+  void setBrand(String v) => _brand = v;
+  void setModel(String v) => _model = v;
+  void setYear(String v) => _year = v;
+  void setPrice(String v) => _price = v;
+  void setLocation(String v) => _location = v;
+  void setDescription(String v) => _description = v;
+  void setSerialNumber(String v) => _serialNumber = v;
+
+  void toggleNegotiable() {
+    _isNegotiable = !_isNegotiable;
+    rebuildUi();
+  }
+
+  void toggleAcceptsOffers() {
+    _acceptsOffers = !_acceptsOffers;
+    rebuildUi();
+  }
 
   void setCategory(String? category) {
     _selectedCategory = category;
@@ -72,15 +108,7 @@ class CreateListingViewModel extends BaseViewModel {
     rebuildUi();
   }
 
-  Future<void> submit({
-    required String title,
-    required String brand,
-    required String model,
-    required String year,
-    required String description,
-    required String price,
-    required String location,
-  }) async {
+  Future<void> submit() async {
     setBusy(true);
 
     final user = _authService.currentUser;
@@ -125,16 +153,19 @@ class CreateListingViewModel extends BaseViewModel {
       id: '',
       sellerId: user.uid,
       sellerName: user.displayName,
-      title: title,
-      description: description,
+      title: _title.trim(),
+      description: _description.trim(),
       category: _selectedCategory ?? 'Other',
-      price: double.tryParse(price) ?? 0,
+      price: double.tryParse(_price.trim()) ?? 0,
       condition: _selectedCondition ?? 'New',
-      location: location,
+      location: _location.trim(),
       imageUrls: imageUrls,
-      brand: brand,
-      model: model,
-      year: int.tryParse(year),
+      brand: _brand.trim(),
+      model: _model.trim(),
+      year: int.tryParse(_year.trim()),
+      isNegotiable: _isNegotiable,
+      acceptsOffers: _acceptsOffers,
+      serialNumber: _serialNumber.trim(),
       createdAt: now,
       updatedAt: now,
     );

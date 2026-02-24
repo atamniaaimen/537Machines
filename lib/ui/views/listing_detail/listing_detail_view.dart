@@ -7,6 +7,7 @@ import '../../common/app_colors.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/machine_card.dart';
 import '../../../core/utils/date_formatter.dart';
 import 'listing_detail_viewmodel.dart';
 
@@ -35,7 +36,8 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.gray300),
+              const Icon(Icons.error_outline,
+                  size: 48, color: AppColors.gray300),
               const SizedBox(height: 16),
               Text('Could not load listing',
                   style: GoogleFonts.titilliumWeb(color: AppColors.gray400)),
@@ -63,14 +65,13 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
             // Top bar
             Container(
               color: AppColors.surface,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: Icon(Icons.arrow_back,
+                    child: const Icon(Icons.arrow_back,
                         size: 22, color: AppColors.gray500),
                   ),
                   Text(
@@ -87,18 +88,28 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
                       if (viewModel.isOwner) ...[
                         GestureDetector(
                           onTap: viewModel.navigateToEdit,
-                          child: Icon(Icons.edit_outlined,
+                          child: const Icon(Icons.edit_outlined,
                               size: 20, color: AppColors.gray500),
                         ),
                         const SizedBox(width: 16),
                         GestureDetector(
                           onTap: viewModel.deleteListing,
-                          child: Icon(Icons.delete_outline,
+                          child: const Icon(Icons.delete_outline,
                               size: 20, color: AppColors.danger),
                         ),
                       ] else
-                        Icon(Icons.favorite_border,
-                            size: 22, color: AppColors.gray500),
+                        GestureDetector(
+                          onTap: viewModel.toggleFavorite,
+                          child: Icon(
+                            viewModel.isFavorited
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 22,
+                            color: viewModel.isFavorited
+                                ? AppColors.danger
+                                : AppColors.gray500,
+                          ),
+                        ),
                     ],
                   ),
                 ],
@@ -120,8 +131,7 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
                         children: [
                           // Badge + time
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               _conditionBadge(listing.condition),
                               Text(
@@ -149,7 +159,7 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
 
                           // Price
                           Text(
-                            '\$${_formatPrice(listing.price)}',
+                            '${_formatPrice(listing.price)} DZD',
                             style: GoogleFonts.titilliumWeb(
                               fontSize: 32,
                               fontWeight: FontWeight.w900,
@@ -186,28 +196,64 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
                           const SizedBox(height: 24),
 
                           // Action buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CustomButton(
-                                  title: 'Contact Seller',
-                                  size: ButtonSize.lg,
-                                  onTap: () {},
+                          if (!viewModel.isOwner) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomButton(
+                                    title: 'Contact Seller',
+                                    size: ButtonSize.lg,
+                                    isLoading: viewModel.isBusy,
+                                    onTap: viewModel.contactSeller,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              CustomButton(
-                                title: 'Share',
-                                variant: ButtonVariant.outline,
-                                size: ButtonSize.lg,
-                                width: 100,
-                                onTap: () {},
-                              ),
-                            ],
-                          ),
+                                const SizedBox(width: 12),
+                                CustomButton(
+                                  title: 'Make Offer',
+                                  variant: ButtonVariant.outline,
+                                  size: ButtonSize.md,
+                                  width: 140,
+                                  onTap: () => _showOfferDialog(
+                                      context, viewModel, listing.price),
+                                ),
+                              ],
+                            ),
+                          ],
+
+                          // Similar machines
+                          if (viewModel.similarListings.isNotEmpty) ...[
+                            _divider(),
+                            _sectionLabel('Similar Machines'),
+                            const SizedBox(height: 12),
+                          ],
                         ],
                       ),
                     ),
+
+                    // Similar machines horizontal scroll
+                    if (viewModel.similarListings.isNotEmpty)
+                      SizedBox(
+                        height: 260,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: viewModel.similarListings.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (context, index) {
+                            final similar = viewModel.similarListings[index];
+                            return SizedBox(
+                              width: 200,
+                              child: MachineCard(
+                                listing: similar,
+                                onTap: () =>
+                                    viewModel.openListingDetail(similar.id),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -446,6 +492,81 @@ class ListingDetailView extends StackedView<ListingDetailViewModel> {
       return buffer.toString().split('').reversed.join();
     }
     return price.toStringAsFixed(0);
+  }
+
+  void _showOfferDialog(
+      BuildContext context, ListingDetailViewModel viewModel, double askingPrice) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Make an Offer',
+          style: GoogleFonts.titilliumWeb(
+            fontWeight: FontWeight.w700,
+            color: AppColors.dark,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Asking price: ${_formatPrice(askingPrice)} DZD',
+              style: GoogleFonts.titilliumWeb(
+                fontSize: 13,
+                color: AppColors.gray400,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              style: GoogleFonts.titilliumWeb(fontSize: 16, color: AppColors.dark),
+              decoration: InputDecoration(
+                labelText: 'Your offer (DZD)',
+                labelStyle: GoogleFonts.titilliumWeb(color: AppColors.gray400),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.gray200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.primaryDark),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.titilliumWeb(color: AppColors.gray400),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final amount = double.tryParse(controller.text.trim());
+              if (amount != null && amount > 0) {
+                Navigator.of(ctx).pop();
+                viewModel.makeOffer(amount);
+              }
+            },
+            child: Text(
+              'Submit Offer',
+              style: GoogleFonts.titilliumWeb(
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

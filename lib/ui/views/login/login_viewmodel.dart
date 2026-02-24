@@ -16,15 +16,21 @@ class LoginViewModel extends BaseViewModel {
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
 
+  String _email = '';
+  String _password = '';
+
+  void setEmail(String v) => _email = v;
+  void setPassword(String v) => _password = v;
+
   void togglePasswordVisibility() {
     _obscurePassword = !_obscurePassword;
     rebuildUi();
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn() async {
     setBusy(true);
 
-    return Executor.run(_authService.signIn(email, password))
+    return Executor.run(_authService.signIn(_email.trim(), _password))
         .then((result) => result.fold(
               (failure) {
                 _crashlytics.logToCrashlytics(

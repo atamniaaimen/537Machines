@@ -5,7 +5,7 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i14;
+import 'package:flutter/material.dart' as _i17;
 import 'package:flutter/material.dart';
 import 'package:machine_marketplace/ui/views/create_listing/create_listing_view.dart'
     as _i8;
@@ -13,6 +13,7 @@ import 'package:machine_marketplace/ui/views/edit_listing/edit_listing_view.dart
     as _i9;
 import 'package:machine_marketplace/ui/views/edit_profile/edit_profile_view.dart'
     as _i11;
+import 'package:machine_marketplace/ui/views/home/home_view.dart' as _i14;
 import 'package:machine_marketplace/ui/views/listing_detail/listing_detail_view.dart'
     as _i7;
 import 'package:machine_marketplace/ui/views/listings/listings_view.dart'
@@ -21,13 +22,17 @@ import 'package:machine_marketplace/ui/views/login/login_view.dart' as _i3;
 import 'package:machine_marketplace/ui/views/main/main_view.dart' as _i5;
 import 'package:machine_marketplace/ui/views/messages/messages_view.dart'
     as _i13;
+import 'package:machine_marketplace/ui/views/notifications/notifications_view.dart'
+    as _i16;
 import 'package:machine_marketplace/ui/views/profile/profile_view.dart' as _i10;
 import 'package:machine_marketplace/ui/views/register/register_view.dart'
     as _i4;
 import 'package:machine_marketplace/ui/views/search/search_view.dart' as _i12;
+import 'package:machine_marketplace/ui/views/settings/settings_view.dart'
+    as _i15;
 import 'package:machine_marketplace/ui/views/startup/startup_view.dart' as _i2;
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i15;
+import 'package:stacked_services/stacked_services.dart' as _i18;
 
 class Routes {
   static const startupView = '/';
@@ -54,6 +59,12 @@ class Routes {
 
   static const messagesView = '/messages-view';
 
+  static const homeView = '/home-view';
+
+  static const settingsView = '/settings-view';
+
+  static const notificationsView = '/notifications-view';
+
   static const all = <String>{
     startupView,
     loginView,
@@ -67,6 +78,9 @@ class Routes {
     editProfileView,
     searchView,
     messagesView,
+    homeView,
+    settingsView,
+    notificationsView,
   };
 }
 
@@ -120,82 +134,116 @@ class StackedRouter extends _i1.RouterBase {
       Routes.messagesView,
       page: _i13.MessagesView,
     ),
+    _i1.RouteDef(
+      Routes.homeView,
+      page: _i14.HomeView,
+    ),
+    _i1.RouteDef(
+      Routes.settingsView,
+      page: _i15.SettingsView,
+    ),
+    _i1.RouteDef(
+      Routes.notificationsView,
+      page: _i16.NotificationsView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.StartupView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i2.StartupView(),
         settings: data,
       );
     },
     _i3.LoginView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.LoginView(),
         settings: data,
       );
     },
     _i4.RegisterView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.RegisterView(),
         settings: data,
       );
     },
     _i5.MainView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i5.MainView(),
         settings: data,
       );
     },
     _i6.ListingsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i6.ListingsView(),
         settings: data,
       );
     },
     _i7.ListingDetailView: (data) {
       final args = data.getArgs<ListingDetailViewArguments>(nullOk: false);
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i7.ListingDetailView(listingId: args.listingId, key: args.key),
         settings: data,
       );
     },
     _i8.CreateListingView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i8.CreateListingView(),
         settings: data,
       );
     },
     _i9.EditListingView: (data) {
       final args = data.getArgs<EditListingViewArguments>(nullOk: false);
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i9.EditListingView(listingId: args.listingId, key: args.key),
         settings: data,
       );
     },
     _i10.ProfileView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i10.ProfileView(),
         settings: data,
       );
     },
     _i11.EditProfileView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i11.EditProfileView(),
         settings: data,
       );
     },
     _i12.SearchView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i17.MaterialPageRoute<dynamic>(
         builder: (context) => const _i12.SearchView(),
         settings: data,
       );
     },
     _i13.MessagesView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i13.MessagesView(),
+      final args = data.getArgs<MessagesViewArguments>(
+        orElse: () => const MessagesViewArguments(),
+      );
+      return _i17.MaterialPageRoute<dynamic>(
+        builder: (context) => _i13.MessagesView(
+            initialConversationId: args.initialConversationId, key: args.key),
+        settings: data,
+      );
+    },
+    _i14.HomeView: (data) {
+      return _i17.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i14.HomeView(),
+        settings: data,
+      );
+    },
+    _i15.SettingsView: (data) {
+      return _i17.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i15.SettingsView(),
+        settings: data,
+      );
+    },
+    _i16.NotificationsView: (data) {
+      return _i17.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i16.NotificationsView(),
         settings: data,
       );
     },
@@ -216,7 +264,7 @@ class ListingDetailViewArguments {
 
   final String listingId;
 
-  final _i14.Key? key;
+  final _i17.Key? key;
 
   @override
   String toString() {
@@ -243,7 +291,7 @@ class EditListingViewArguments {
 
   final String listingId;
 
-  final _i14.Key? key;
+  final _i17.Key? key;
 
   @override
   String toString() {
@@ -262,7 +310,35 @@ class EditListingViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i15.NavigationService {
+class MessagesViewArguments {
+  const MessagesViewArguments({
+    this.initialConversationId,
+    this.key,
+  });
+
+  final String? initialConversationId;
+
+  final _i17.Key? key;
+
+  @override
+  String toString() {
+    return '{"initialConversationId": "$initialConversationId", "key": "$key"}';
+  }
+
+  @override
+  bool operator ==(covariant MessagesViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.initialConversationId == initialConversationId &&
+        other.key == key;
+  }
+
+  @override
+  int get hashCode {
+    return initialConversationId.hashCode ^ key.hashCode;
+  }
+}
+
+extension NavigatorStateExtension on _i18.NavigationService {
   Future<dynamic> navigateToStartupView([
     int? routerId,
     bool preventDuplicates = true,
@@ -335,7 +411,7 @@ extension NavigatorStateExtension on _i15.NavigationService {
 
   Future<dynamic> navigateToListingDetailView({
     required String listingId,
-    _i14.Key? key,
+    _i17.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -366,7 +442,7 @@ extension NavigatorStateExtension on _i15.NavigationService {
 
   Future<dynamic> navigateToEditListingView({
     required String listingId,
-    _i14.Key? key,
+    _i17.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -423,14 +499,60 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToMessagesView([
+  Future<dynamic> navigateToMessagesView({
+    String? initialConversationId,
+    _i17.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.messagesView,
+        arguments: MessagesViewArguments(
+            initialConversationId: initialConversationId, key: key),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(Routes.messagesView,
+    return navigateTo<dynamic>(Routes.homeView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToSettingsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.settingsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToNotificationsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.notificationsView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -509,7 +631,7 @@ extension NavigatorStateExtension on _i15.NavigationService {
 
   Future<dynamic> replaceWithListingDetailView({
     required String listingId,
-    _i14.Key? key,
+    _i17.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -540,7 +662,7 @@ extension NavigatorStateExtension on _i15.NavigationService {
 
   Future<dynamic> replaceWithEditListingView({
     required String listingId,
-    _i14.Key? key,
+    _i17.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -597,14 +719,60 @@ extension NavigatorStateExtension on _i15.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithMessagesView([
+  Future<dynamic> replaceWithMessagesView({
+    String? initialConversationId,
+    _i17.Key? key,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.messagesView,
+        arguments: MessagesViewArguments(
+            initialConversationId: initialConversationId, key: key),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(Routes.messagesView,
+    return replaceWith<dynamic>(Routes.homeView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithSettingsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.settingsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithNotificationsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.notificationsView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

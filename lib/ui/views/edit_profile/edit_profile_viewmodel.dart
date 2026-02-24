@@ -21,6 +21,41 @@ class EditProfileViewModel extends BaseViewModel {
 
   AppUser? get currentUser => _authService.currentUser;
 
+  // Form values as plain strings
+  String _firstName = '';
+  String _lastName = '';
+  String _company = '';
+  String _phone = '';
+  String _location = '';
+  String _bio = '';
+
+  String get firstName => _firstName;
+  String get lastName => _lastName;
+  String get company => _company;
+  String get phone => _phone;
+  String get location => _location;
+  String get bio => _bio;
+  String get email => currentUser?.email ?? '';
+
+  void setFirstName(String v) => _firstName = v;
+  void setLastName(String v) => _lastName = v;
+  void setCompany(String v) => _company = v;
+  void setPhone(String v) => _phone = v;
+  void setLocation(String v) => _location = v;
+  void setBio(String v) => _bio = v;
+
+  void initFields() {
+    final user = currentUser;
+    if (user != null) {
+      _firstName = user.firstName;
+      _lastName = user.lastName;
+      _company = user.company;
+      _phone = user.phone;
+      _location = user.location;
+      _bio = user.bio;
+    }
+  }
+
   XFile? _pickedAvatar;
   XFile? get pickedAvatar => _pickedAvatar;
 
@@ -43,14 +78,7 @@ class EditProfileViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> save({
-    required String firstName,
-    required String lastName,
-    required String company,
-    required String phone,
-    required String location,
-    required String bio,
-  }) async {
+  Future<void> save() async {
     if (currentUser == null) return;
     setBusy(true);
 
@@ -79,12 +107,12 @@ class EditProfileViewModel extends BaseViewModel {
     }
 
     final updatedUser = currentUser!.copyWith(
-      firstName: firstName,
-      lastName: lastName,
-      company: company,
-      phone: phone,
-      location: location,
-      bio: bio,
+      firstName: _firstName.trim(),
+      lastName: _lastName.trim(),
+      company: _company.trim(),
+      phone: _phone.trim(),
+      location: _location.trim(),
+      bio: _bio.trim(),
       photoUrl: photoUrl,
     );
 

@@ -11,19 +11,14 @@ import 'register_viewmodel.dart';
 class RegisterView extends StackedView<RegisterViewModel> {
   const RegisterView({super.key});
 
+  static final _formKey = GlobalKey<FormState>();
+
   @override
   Widget builder(
     BuildContext context,
     RegisterViewModel viewModel,
     Widget? child,
   ) {
-    final firstNameController = TextEditingController();
-    final lastNameController = TextEditingController();
-    final emailController = TextEditingController();
-    final companyController = TextEditingController();
-    final passwordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       backgroundColor: AppColors.gray50,
       body: Center(
@@ -45,7 +40,7 @@ class RegisterView extends StackedView<RegisterViewModel> {
               ],
             ),
             child: Form(
-              key: formKey,
+              key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -97,18 +92,18 @@ class RegisterView extends StackedView<RegisterViewModel> {
                     children: [
                       Expanded(
                         child: CustomTextField(
-                          controller: firstNameController,
                           label: 'First Name',
                           hint: 'John',
+                          onChanged: viewModel.setFirstName,
                           validator: Validators.validateName,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: CustomTextField(
-                          controller: lastNameController,
                           label: 'Last Name',
                           hint: 'Smith',
+                          onChanged: viewModel.setLastName,
                           validator: Validators.validateName,
                         ),
                       ),
@@ -117,25 +112,63 @@ class RegisterView extends StackedView<RegisterViewModel> {
                   const SizedBox(height: 20),
 
                   CustomTextField(
-                    controller: emailController,
                     label: 'Email',
                     hint: 'you@company.com',
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: viewModel.setEmail,
                     validator: Validators.validateEmail,
                   ),
                   const SizedBox(height: 20),
 
                   CustomTextField(
-                    controller: companyController,
                     label: 'Company',
                     hint: 'Your company name',
+                    onChanged: viewModel.setCompany,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Role selector
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'I want to',
+                        style: GoogleFonts.titilliumWeb(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.dark,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _RoleChip(
+                            label: 'Buy',
+                            isSelected: viewModel.role == 'buyer',
+                            onTap: () => viewModel.setRole('buyer'),
+                          ),
+                          const SizedBox(width: 8),
+                          _RoleChip(
+                            label: 'Sell',
+                            isSelected: viewModel.role == 'seller',
+                            onTap: () => viewModel.setRole('seller'),
+                          ),
+                          const SizedBox(width: 8),
+                          _RoleChip(
+                            label: 'Both',
+                            isSelected: viewModel.role == 'both',
+                            onTap: () => viewModel.setRole('both'),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
 
                   CustomTextField(
-                    controller: passwordController,
                     label: 'Password',
                     hint: 'Min. 8 characters',
+                    onChanged: viewModel.setPassword,
                     obscureText: viewModel.obscurePassword,
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -156,14 +189,8 @@ class RegisterView extends StackedView<RegisterViewModel> {
                     size: ButtonSize.lg,
                     isLoading: viewModel.isBusy,
                     onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        viewModel.signUp(
-                          firstName: firstNameController.text.trim(),
-                          lastName: lastNameController.text.trim(),
-                          email: emailController.text.trim(),
-                          company: companyController.text.trim(),
-                          password: passwordController.text,
-                        );
+                      if (_formKey.currentState!.validate()) {
+                        viewModel.signUp();
                       }
                     },
                   ),
@@ -236,4 +263,44 @@ class RegisterView extends StackedView<RegisterViewModel> {
   @override
   RegisterViewModel viewModelBuilder(BuildContext context) =>
       RegisterViewModel();
+}
+
+class _RoleChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RoleChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primaryPale : AppColors.gray50,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected ? AppColors.primaryDark : AppColors.gray200,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.titilliumWeb(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? AppColors.primaryDark : AppColors.gray400,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

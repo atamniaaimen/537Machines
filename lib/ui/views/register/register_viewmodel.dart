@@ -16,26 +16,40 @@ class RegisterViewModel extends BaseViewModel {
   bool _obscurePassword = true;
   bool get obscurePassword => _obscurePassword;
 
+  String _firstName = '';
+  String _lastName = '';
+  String _email = '';
+  String _company = '';
+  String _password = '';
+  String _role = 'both';
+
+  String get role => _role;
+
+  void setFirstName(String v) => _firstName = v;
+  void setLastName(String v) => _lastName = v;
+  void setEmail(String v) => _email = v;
+  void setCompany(String v) => _company = v;
+  void setPassword(String v) => _password = v;
+
+  void setRole(String v) {
+    _role = v;
+    rebuildUi();
+  }
+
   void togglePasswordVisibility() {
     _obscurePassword = !_obscurePassword;
     rebuildUi();
   }
 
-  Future<void> signUp({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String password,
-    String company = '',
-  }) async {
+  Future<void> signUp() async {
     setBusy(true);
 
     return Executor.run(_authService.signUp(
-      email: email,
-      password: password,
-      firstName: firstName,
-      lastName: lastName,
-      company: company,
+      email: _email.trim(),
+      password: _password,
+      firstName: _firstName.trim(),
+      lastName: _lastName.trim(),
+      company: _company.trim(),
     )).then((result) => result.fold(
           (failure) {
             _crashlytics.logToCrashlytics(

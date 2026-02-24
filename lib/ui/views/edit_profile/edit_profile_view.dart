@@ -12,6 +12,8 @@ import 'edit_profile_viewmodel.dart';
 class EditProfileView extends StackedView<EditProfileViewModel> {
   const EditProfileView({super.key});
 
+  static final _formKey = GlobalKey<FormState>();
+
   @override
   Widget builder(
     BuildContext context,
@@ -25,15 +27,6 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
         body: Center(child: Text('Not logged in')),
       );
     }
-
-    final firstNameController = TextEditingController(text: user.firstName);
-    final lastNameController = TextEditingController(text: user.lastName);
-    final companyController = TextEditingController(text: user.company);
-    final phoneController = TextEditingController(text: user.phone);
-    final locationController = TextEditingController(text: user.location);
-    final bioController = TextEditingController(text: user.bio);
-    final emailController = TextEditingController(text: user.email);
-    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -51,7 +44,7 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
-          key: formKey,
+          key: _formKey,
           child: Column(
             children: [
               // Avatar with change photo
@@ -89,8 +82,9 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: firstNameController,
+                      initialValue: viewModel.firstName,
                       label: 'First Name',
+                      onChanged: viewModel.setFirstName,
                       validator: (v) =>
                           Validators.validateRequired(v, 'First name'),
                     ),
@@ -98,8 +92,9 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      controller: lastNameController,
+                      initialValue: viewModel.lastName,
                       label: 'Last Name',
+                      onChanged: viewModel.setLastName,
                       validator: (v) =>
                           Validators.validateRequired(v, 'Last name'),
                     ),
@@ -110,39 +105,43 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
 
               // Email (read-only)
               CustomTextField(
-                controller: emailController,
+                initialValue: viewModel.email,
                 label: 'Email',
                 enabled: false,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: companyController,
+                initialValue: viewModel.company,
                 label: 'Company',
                 hint: 'Your company name',
+                onChanged: viewModel.setCompany,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: phoneController,
+                initialValue: viewModel.phone,
                 label: 'Phone',
                 hint: '+1 (555) 123-4567',
                 keyboardType: TextInputType.phone,
+                onChanged: viewModel.setPhone,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: locationController,
+                initialValue: viewModel.location,
                 label: 'Location',
                 hint: 'e.g. New York, NY',
+                onChanged: viewModel.setLocation,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: bioController,
+                initialValue: viewModel.bio,
                 label: 'Bio',
                 hint: 'Tell us about yourself...',
                 maxLines: 3,
+                onChanged: viewModel.setBio,
               ),
 
               verticalSpaceLarge,
@@ -163,15 +162,8 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
                 size: ButtonSize.lg,
                 isLoading: viewModel.isBusy,
                 onTap: () {
-                  if (formKey.currentState!.validate()) {
-                    viewModel.save(
-                      firstName: firstNameController.text.trim(),
-                      lastName: lastNameController.text.trim(),
-                      company: companyController.text.trim(),
-                      phone: phoneController.text.trim(),
-                      location: locationController.text.trim(),
-                      bio: bioController.text.trim(),
-                    );
+                  if (_formKey.currentState!.validate()) {
+                    viewModel.save();
                   }
                 },
               ),
@@ -186,4 +178,8 @@ class EditProfileView extends StackedView<EditProfileViewModel> {
   @override
   EditProfileViewModel viewModelBuilder(BuildContext context) =>
       EditProfileViewModel();
+
+  @override
+  void onViewModelReady(EditProfileViewModel viewModel) =>
+      viewModel.initFields();
 }

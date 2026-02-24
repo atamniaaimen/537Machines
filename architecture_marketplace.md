@@ -1,13 +1,13 @@
-# Machine Marketplace — Stacked Architecture Reference
+# 537 Machines — Stacked Architecture Reference
 
-> This document is the single source of truth for how every feature in the Machine Marketplace app is built.
+> This document is the single source of truth for how every feature in the 537 Machines app is built.
 > Follow it layer by layer, every time.
 
 ---
 
 ## 1. Architecture Overview
 
-Machine Marketplace uses **Stacked** (by FilledStacks), an MVVM framework for Flutter. The architecture enforces strict separation of concerns across **five layers**:
+537 Machines uses **Stacked** (by FilledStacks), an MVVM framework for Flutter. The architecture enforces strict separation of concerns across **five layers**:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -295,7 +295,7 @@ View — reads viewModel.hasError / viewModel.isBusy / viewModel.modelError
 ```
 lib/
 ├── main.dart                           # Entry point: Firebase init, setupLocator, setupDialogUi, setupBottomSheetUi
-├── firebase_options.dart               # Firebase configuration (generate with flutterfire configure)
+├── firebase_options.dart               # Firebase configuration (generated with flutterfire configure)
 ├── app/
 │   ├── app.dart                        # @StackedApp annotation (routes + dependencies + dialogs + sheets)
 │   ├── app.locator.dart                # GENERATED — setupLocator()
@@ -316,11 +316,16 @@ lib/
 │   ├── services/
 │   │   └── crashlytics_service.dart    # Logger-based logging (replace with Firebase Crashlytics in production)
 │   └── utils/
-│       └── date_formatter.dart         # Human-friendly date formatting + time ago
+│       ├── date_formatter.dart         # Human-friendly date formatting + time ago
+│       └── seed_data.dart              # Development seed data utility
 ├── models/
-│   ├── app_user.dart                   # User data class
-│   ├── machine_listing.dart            # Machine listing data class
-│   └── listing_filter.dart             # Filter criteria for search
+│   ├── app_user.dart                   # User profile with notification prefs + role
+│   ├── machine_listing.dart            # Machine listing with status, offers, negotiation flags
+│   ├── listing_filter.dart             # Filter criteria for search/browse
+│   ├── conversation.dart               # Chat conversation between two users about a listing
+│   ├── chat_message.dart               # Single message in a conversation
+│   ├── offer.dart                      # Price offer on a listing
+│   └── app_notification.dart           # In-app notification (message, offer, alert, system)
 ├── repositories/
 │   ├── firestore_repository.dart       # Generic Firestore CRUD adapter
 │   ├── auth_repository.dart            # Firebase Auth + Google Sign-In adapter
@@ -329,18 +334,25 @@ lib/
 │   ├── auth_service.dart               # Auth domain logic (reactive user state)
 │   ├── listing_service.dart            # Listing CRUD + search/filter
 │   ├── storage_service.dart            # Image upload/delete facade
-│   └── user_service.dart               # User profile read/update
+│   ├── user_service.dart               # User profile read/update
+│   ├── message_service.dart            # Conversations + chat messages
+│   ├── favorite_service.dart           # User favorites (subcollection)
+│   ├── offer_service.dart              # Price offers on listings (subcollection)
+│   └── notification_service.dart       # In-app notifications (subcollection)
 ├── ui/
 │   ├── common/
 │   │   ├── app_colors.dart             # All brand colors as constants
 │   │   ├── app_text_styles.dart        # Text styles
 │   │   ├── ui_helpers.dart             # Spacing constants + screen size helpers
-│   │   └── validators.dart             # Form validation (email, password, price, etc.)
+│   │   └── validators.dart             # Form validation (email, password, price, name)
 │   ├── widgets/
 │   │   ├── machine_card.dart           # Reusable machine listing card (grid)
 │   │   ├── custom_text_field.dart      # Styled text field with validation
-│   │   ├── custom_button.dart          # Primary / outlined button with loading state
-│   │   └── loading_indicator.dart      # Centered spinner with optional message
+│   │   ├── custom_button.dart          # Primary / outlined / ghost / danger button with loading
+│   │   ├── loading_indicator.dart      # Centered spinner with optional message
+│   │   ├── avatar_widget.dart          # Circular avatar with initials fallback
+│   │   ├── logo_widget.dart            # App logo widget (sm/md/lg)
+│   │   └── app_drawer.dart             # Navigation drawer with user header + menu items
 │   ├── dialogs/
 │   │   └── confirm/
 │   │       └── confirm_dialog.dart     # Confirmation dialog (delete, etc.)
@@ -354,30 +366,45 @@ lib/
 │       ├── login/                      # Email/password + Google Sign-In
 │       │   ├── login_view.dart
 │       │   └── login_viewmodel.dart
-│       ├── register/                   # Name, email, password, confirm
+│       ├── register/                   # Name, email, company, role, password
 │       │   ├── register_view.dart
 │       │   └── register_viewmodel.dart
-│       ├── main/                       # Bottom navigation shell
+│       ├── main/                       # Bottom navigation shell + drawer
 │       │   ├── main_view.dart
 │       │   └── main_viewmodel.dart
+│       ├── home/                       # Hero section, categories, featured/recent listings
+│       │   ├── home_view.dart
+│       │   └── home_viewmodel.dart
 │       ├── listings/                   # Browse grid + search + filter
 │       │   ├── listings_view.dart
 │       │   └── listings_viewmodel.dart
-│       ├── listing_detail/             # Carousel, info, seller, edit/delete
+│       ├── search/                     # Dedicated search view
+│       │   ├── search_view.dart
+│       │   └── search_viewmodel.dart
+│       ├── listing_detail/             # Carousel, specs, seller, contact, offer, similar
 │       │   ├── listing_detail_view.dart
 │       │   └── listing_detail_viewmodel.dart
-│       ├── create_listing/             # Form + image picker + submit
+│       ├── create_listing/             # Form + image picker + toggles + submit
 │       │   ├── create_listing_view.dart
 │       │   └── create_listing_viewmodel.dart
 │       ├── edit_listing/               # Pre-populated form + update
 │       │   ├── edit_listing_view.dart
 │       │   └── edit_listing_viewmodel.dart
-│       ├── profile/                    # ReactiveViewModel watching AuthService
+│       ├── messages/                   # Conversation list + chat screen
+│       │   ├── messages_view.dart
+│       │   └── messages_viewmodel.dart
+│       ├── notifications/              # Notification list with read/unread states
+│       │   ├── notifications_view.dart
+│       │   └── notifications_viewmodel.dart
+│       ├── profile/                    # User info + My Listings / Saved tabs
 │       │   ├── profile_view.dart
 │       │   └── profile_viewmodel.dart
-│       └── edit_profile/               # Name + avatar upload
-│           ├── edit_profile_view.dart
-│           └── edit_profile_viewmodel.dart
+│       ├── edit_profile/               # Name + avatar upload
+│       │   ├── edit_profile_view.dart
+│       │   └── edit_profile_viewmodel.dart
+│       └── settings/                   # Notification toggles, sign out, about
+│           ├── settings_view.dart
+│           └── settings_viewmodel.dart
 ```
 
 ---
@@ -404,20 +431,26 @@ lib/
 class AppUser {
   final String uid;
   final String email;
-  final String displayName;
-  final String photoUrl;
+  final String firstName;
+  final String lastName;
+  final String photoUrl;          // default: ''
+  final String company;           // default: ''
+  final String phone;             // default: ''
+  final String location;          // default: ''
+  final String bio;               // default: ''
+  final bool notifyMessages;      // default: true
+  final bool notifyOffers;        // default: true
+  final bool notifyPriceDrops;    // default: false
+  final bool notifyNewListings;   // default: false
+  final String role;              // 'buyer' | 'seller' | 'both' — default: 'both'
   final DateTime createdAt;
 
-  const AppUser({
-    required this.uid,
-    required this.email,
-    required this.displayName,
-    this.photoUrl = '',
-    required this.createdAt,
-  });
+  // Computed getters
+  String get displayName => '$firstName $lastName'.trim();
+  String get initials;  // first letter of firstName + lastName
 
   factory AppUser.fromJson(Map<String, dynamic> json, {String? id}) { ... }
-  Map<String, dynamic> toJson() { ... }
+  Map<String, dynamic> toJson() { ... }  // also writes computed displayName
   AppUser copyWith({ ... }) { ... }
 }
 ```
@@ -432,19 +465,27 @@ class MachineListing {
   final String sellerId;
   final String sellerName;
   final String title;
-  final String titleLowercase;   // stored for Firestore prefix search
+  final String titleLowercase;    // auto-generated for Firestore prefix search
   final String description;
   final String category;
   final double price;
-  final String condition;
+  final String condition;         // 'New' | 'Used' | 'Refurbished'
   final String location;
-  final List<String> imageUrls;
+  final String brand;             // default: ''
+  final String model;             // default: ''
+  final int? year;                // nullable
+  final int? hours;               // nullable
+  final List<String> imageUrls;   // default: []
+  final String status;            // 'active' | 'sold' | 'paused' — default: 'active'
+  final bool isNegotiable;        // default: false
+  final bool acceptsOffers;       // default: true
+  final String serialNumber;      // default: ''
   final DateTime createdAt;
   final DateTime updatedAt;
 
   factory MachineListing.fromJson(Map<String, dynamic> json, {String? id}) { ... }
   Map<String, dynamic> toJson() { ... }   // auto-generates titleLowercase
-  MachineListing copyWith({ ... }) { ... }
+  MachineListing copyWith({ ..., bool clearYear, bool clearHours }) { ... }
 }
 ```
 
@@ -462,6 +503,87 @@ class ListingFilter {
 
   bool get isEmpty => ...;
   ListingFilter copyWith({ ..., bool clearSearch = false, ... }) { ... }
+}
+```
+
+#### Conversation
+
+**File:** `lib/models/conversation.dart`
+
+```dart
+class Conversation {
+  final String id;
+  final List<String> participantIds;
+  final String listingId;
+  final String listingTitle;      // default: ''
+  final double listingPrice;      // default: 0
+  final String listingImageUrl;   // default: ''
+  final String lastMessage;       // default: ''
+  final DateTime? lastMessageAt;  // nullable
+  final Map<String, int> unreadCounts;  // default: {}
+
+  int unreadCountFor(String userId) => unreadCounts[userId] ?? 0;
+
+  factory Conversation.fromJson(Map<String, dynamic> json, {String? id}) { ... }
+  Map<String, dynamic> toJson() { ... }
+}
+```
+
+#### ChatMessage
+
+**File:** `lib/models/chat_message.dart`
+
+```dart
+class ChatMessage {
+  final String id;
+  final String senderId;
+  final String text;
+  final DateTime createdAt;
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json, {String? id}) { ... }
+  Map<String, dynamic> toJson() { ... }
+}
+```
+
+#### Offer
+
+**File:** `lib/models/offer.dart`
+
+```dart
+class Offer {
+  final String id;
+  final String listingId;
+  final String buyerId;
+  final String sellerId;
+  final double amount;
+  final String status;    // 'pending' | 'accepted' | 'rejected' — default: 'pending'
+  final DateTime createdAt;
+
+  factory Offer.fromJson(Map<String, dynamic> json, {String? id}) { ... }
+  Map<String, dynamic> toJson() { ... }
+  Offer copyWith({ ... }) { ... }
+}
+```
+
+#### AppNotification
+
+**File:** `lib/models/app_notification.dart`
+
+```dart
+enum NotificationType { message, offer, priceAlert, system }
+
+class AppNotification {
+  final String id;
+  final NotificationType type;
+  final String title;
+  final String description;
+  final bool isRead;          // default: false
+  final String? referenceId;  // nullable — links to conversation/listing/offer
+  final DateTime createdAt;
+
+  factory AppNotification.fromJson(Map<String, dynamic> json, {String? id}) { ... }
+  Map<String, dynamic> toJson() { ... }
+  AppNotification copyWith({ ... }) { ... }
 }
 ```
 
@@ -565,8 +687,8 @@ class AuthService with ListenableServiceMixin {
     listenToReactiveValues([_currentUser]);
   }
 
-  Future<void> signIn(String email, String password) { ... }
-  Future<void> signUp(String email, String password, String name) { ... }
+  Future<void> signIn({email, password}) { ... }
+  Future<void> signUp({email, password, firstName, lastName, company}) { ... }
   Future<void> signInWithGoogle() { ... }
   Future<void> signOut() { ... }
   Future<void> tryAutoLogin() { ... }
@@ -622,6 +744,80 @@ class UserService {
 }
 ```
 
+#### MessageService
+
+**File:** `lib/services/message_service.dart`
+
+Manages conversations and chat messages using Firestore subcollections.
+
+```dart
+class MessageService {
+  Future<List<Conversation>> getConversations(String userId) { ... }
+  Future<List<ChatMessage>> getMessages(String conversationId) { ... }
+  Future<void> sendMessage(String conversationId, ChatMessage message) { ... }
+  Future<Conversation> getOrCreateConversation({
+    senderId, receiverId, listingId, listingTitle, listingPrice, listingImageUrl,
+  }) { ... }
+  Future<void> markConversationRead(String conversationId, String userId) { ... }
+}
+```
+
+- `getConversations` → queries where `participantIds` arrayContains userId, ordered by `lastMessageAt` desc
+- `getMessages` → reads subcollection `conversations/{id}/messages` ordered by `createdAt` asc
+- `sendMessage` → adds to messages subcollection + updates parent conversation `lastMessage`/`lastMessageAt`
+- `getOrCreateConversation` → finds existing or creates new conversation doc
+- `markConversationRead` → sets `unreadCounts.$userId = 0` with merge
+
+#### FavoriteService
+
+**File:** `lib/services/favorite_service.dart`
+
+Manages user favorites as a subcollection under the user doc.
+
+```dart
+class FavoriteService {
+  Future<void> addFavorite(String userId, String listingId) { ... }
+  Future<void> removeFavorite(String userId, String listingId) { ... }
+  Future<List<String>> getFavoriteIds(String userId) { ... }
+  Future<bool> isFavorite(String userId, String listingId) { ... }
+}
+```
+
+- Path: `users/{userId}/favorites/{listingId}`
+- `isFavorite` returns `false` on failure (non-throwing)
+
+#### OfferService
+
+**File:** `lib/services/offer_service.dart`
+
+Manages price offers as a subcollection under the listing doc.
+
+```dart
+class OfferService {
+  Future<String> makeOffer(Offer offer) { ... }
+  Future<List<Offer>> getOffersForListing(String listingId) { ... }
+  Future<void> updateOfferStatus(String listingId, String offerId, String status) { ... }
+}
+```
+
+- Path: `listings/{listingId}/offers/{autoId}`
+
+#### NotificationService
+
+**File:** `lib/services/notification_service.dart`
+
+Manages in-app notifications as a subcollection under the user doc.
+
+```dart
+class NotificationService {
+  Future<List<AppNotification>> getNotifications(String userId) { ... }
+  Future<void> markAsRead(String userId, String notificationId) { ... }
+}
+```
+
+- Path: `users/{userId}/notifications/{autoId}`
+- `getNotifications` returns latest 50, ordered by `createdAt` desc
+
 #### Service Rules
 
 | Do | Don't |
@@ -646,14 +842,19 @@ class UserService {
 |-----------|------|-----|
 | StartupViewModel | `BaseViewModel` | One-shot auto-login check + navigate |
 | LoginViewModel | `BaseViewModel` | Form submission + error handling |
-| RegisterViewModel | `BaseViewModel` | Form submission + error handling |
-| MainViewModel | `IndexTrackingViewModel` | Bottom nav tab index tracking |
+| RegisterViewModel | `BaseViewModel` | Form + role selection + error handling |
+| MainViewModel | `IndexTrackingViewModel` | Bottom nav tab index + drawer actions + currentUser |
+| HomeViewModel | `BaseViewModel` | Featured/recent listings, category navigation |
 | ListingsViewModel | `BaseViewModel` | Loads listings, search/filter state |
-| ListingDetailViewModel | `BaseViewModel` | Loads single listing, owner actions |
-| CreateListingViewModel | `BaseViewModel` | Form state + image picking + submit |
+| SearchViewModel | `BaseViewModel` | Dedicated search with query + results |
+| ListingDetailViewModel | `BaseViewModel` | Loads listing, favorites, offers, similar machines, seller contact |
+| CreateListingViewModel | `BaseViewModel` | Form state + image picking + toggles + submit |
 | EditListingViewModel | `BaseViewModel` | Pre-populated form + update |
-| ProfileViewModel | `ReactiveViewModel` | Auto-rebuilds when `AuthService` changes |
+| MessagesViewModel | `BaseViewModel` | Conversation list + chat state + send message |
+| NotificationsViewModel | `BaseViewModel` | Notification list + mark read |
+| ProfileViewModel | `ReactiveViewModel` | Auto-rebuilds when `AuthService` changes, My Listings / Saved tabs |
 | EditProfileViewModel | `BaseViewModel` | Name/avatar update |
+| SettingsViewModel | `ReactiveViewModel` | Notification toggles + sign out |
 
 #### Two Ways to Communicate Errors to UI
 
@@ -674,10 +875,10 @@ setError(failure);  // View reads viewModel.hasError / viewModel.modelError
 #### Example: LoginViewModel
 
 ```dart
-Future<void> signIn(String email, String password) async {
+Future<void> signIn() async {
   setBusy(true);
 
-  return Executor.run(_authService.signIn(email, password))
+  return Executor.run(_authService.signIn(email: _email.trim(), password: _password))
       .then((result) => result.fold(
             (failure) {
               _crashlytics.logToCrashlytics(Level.warning,
@@ -718,6 +919,36 @@ class ProfileViewModel extends ReactiveViewModel {
   // Auto-rebuilds whenever AuthService._currentUser changes
 }
 ```
+
+#### Form Pattern — No TextEditingController in builder()
+
+Views use `onChanged` callbacks + static `GlobalKey<FormState>`:
+
+```dart
+// ViewModel — stores values as plain strings
+String _email = '';
+void setEmail(String v) => _email = v;
+
+// View — static form key, onChanged callbacks
+static final _formKey = GlobalKey<FormState>();
+
+CustomTextField(
+  label: 'Email',
+  onChanged: viewModel.setEmail,
+  validator: Validators.validateEmail,
+),
+
+CustomButton(
+  title: 'Submit',
+  onTap: () {
+    if (_formKey.currentState!.validate()) {
+      viewModel.submit();
+    }
+  },
+),
+```
+
+**Never** create `TextEditingController` inside `builder()` — it gets recreated on every rebuild.
 
 ---
 
@@ -774,6 +1005,11 @@ class ListingsView extends StackedView<ListingsViewModel> {
     MaterialRoute(page: EditListingView),
     MaterialRoute(page: ProfileView),
     MaterialRoute(page: EditProfileView),
+    MaterialRoute(page: SearchView),
+    MaterialRoute(page: MessagesView),
+    MaterialRoute(page: HomeView),
+    MaterialRoute(page: SettingsView),
+    MaterialRoute(page: NotificationsView),
   ],
   dependencies: [
     // Stacked built-in services
@@ -785,16 +1021,20 @@ class ListingsView extends StackedView<ListingsViewModel> {
     // Core services
     LazySingleton(classType: CrashlyticsService),
 
-    // Repositories
+    // Repositories (primitive adapters — one per external system)
     LazySingleton(classType: FirestoreRepository),
     LazySingleton(classType: AuthRepository),
     LazySingleton(classType: StorageRepository),
 
-    // Services
+    // Services (domain facades — compose repositories)
     LazySingleton(classType: AuthService),
     LazySingleton(classType: ListingService),
     LazySingleton(classType: StorageService),
     LazySingleton(classType: UserService),
+    LazySingleton(classType: NotificationService),
+    LazySingleton(classType: MessageService),
+    LazySingleton(classType: FavoriteService),
+    LazySingleton(classType: OfferService),
   ],
   dialogs: [
     StackedDialog(classType: ConfirmDialog),
@@ -856,8 +1096,38 @@ _navigationService.back();
 ```json
 {
   "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
   "displayName": "John Doe",
   "photoUrl": "https://...",
+  "company": "ACME Corp",
+  "phone": "+213...",
+  "location": "Algiers",
+  "bio": "Industrial equipment dealer",
+  "notifyMessages": true,
+  "notifyOffers": true,
+  "notifyPriceDrops": false,
+  "notifyNewListings": false,
+  "role": "both",
+  "createdAt": Timestamp
+}
+```
+
+### users/{uid}/favorites/{listingId}
+```json
+{
+  "addedAt": Timestamp
+}
+```
+
+### users/{uid}/notifications/{autoId}
+```json
+{
+  "type": "message|offer|priceAlert|system",
+  "title": "New offer received",
+  "description": "Someone offered 50,000 DZD for your CNC machine",
+  "isRead": false,
+  "referenceId": "listingId or conversationId",
   "createdAt": Timestamp
 }
 ```
@@ -871,12 +1141,57 @@ _navigationService.back();
   "titleLowercase": "cnc milling machine",
   "description": "Used CNC machine in great condition...",
   "category": "CNC Machines",
-  "price": 15000.0,
-  "condition": "Good",
-  "location": "New York, NY",
+  "price": 150000.0,
+  "condition": "Used",
+  "location": "Algiers",
+  "brand": "Haas",
+  "model": "VF-2",
+  "year": 2020,
+  "hours": 3500,
   "imageUrls": ["https://..."],
+  "status": "active",
+  "isNegotiable": true,
+  "acceptsOffers": true,
+  "serialNumber": "SN-12345",
   "createdAt": Timestamp,
   "updatedAt": Timestamp
+}
+```
+
+### listings/{autoId}/offers/{autoId}
+```json
+{
+  "listingId": "listing123",
+  "buyerId": "uid456",
+  "sellerId": "uid123",
+  "amount": 120000.0,
+  "status": "pending",
+  "createdAt": Timestamp
+}
+```
+
+### conversations/{autoId}
+```json
+{
+  "participantIds": ["uid123", "uid456"],
+  "listingId": "listing789",
+  "listingTitle": "CNC Milling Machine",
+  "listingPrice": 150000.0,
+  "listingImageUrl": "https://...",
+  "lastMessage": "Is this still available?",
+  "lastMessageAt": Timestamp,
+  "unreadCounts": { "uid123": 0, "uid456": 1 }
+}
+```
+
+**Required composite index:** `participantIds` (Arrays) + `lastMessageAt` (Descending)
+
+### conversations/{autoId}/messages/{autoId}
+```json
+{
+  "senderId": "uid123",
+  "text": "Is this still available?",
+  "createdAt": Timestamp
 }
 ```
 
@@ -922,12 +1237,15 @@ Create `lib/core/error_handling/failures/your_failure.dart` if the feature intro
 - [ ] Switches on `failure.type` for specific UI reactions
 - [ ] Manages `setBusy()` in **both** branches
 - [ ] **NEVER calls Repositories directly**
+- [ ] Form values stored as plain strings (no TextEditingController in builder)
 
 ### Step 6: View
 - [ ] Extends `StackedView<MyViewModel>`
 - [ ] Handles `isBusy`, `hasError` states
 - [ ] User actions forwarded to ViewModel methods
 - [ ] No service calls, no Executor, no business logic
+- [ ] Static `GlobalKey<FormState>` for forms
+- [ ] Uses `onChanged` callbacks for form fields
 
 ### Step 7: Register in app.dart
 Add route, repository, service, dialog, or bottom sheet to `@StackedApp`.
@@ -962,7 +1280,7 @@ dart run build_runner build --delete-conflicting-outputs
 | **ViewModels** | `app.locator.dart`, `app.router.dart`, Services, Models, Executor, Failure types | Flutter widgets, Views, Repositories |
 | **Services** | `app.locator.dart`, Repositories, other Services, Models, Executor, Failure types | Flutter widgets, ViewModels, Views |
 | **Repositories** | External SDK packages, Models, Failure types | Services, ViewModels, Views, Executor |
-| **Models** | Dart core only | Everything else |
+| **Models** | Dart core only (`cloud_firestore` for `Timestamp`) | Everything else |
 
 ### Busy/Error State
 
@@ -980,14 +1298,31 @@ _crashlytics.logToCrashlytics(
     failure.stackTrace);
 ```
 
-### Machine Categories
+### Constants
 
-Defined in `lib/core/constants/app_constants.dart`:
-CNC Machines, Lathes, Milling Machines, Drilling Machines, Grinding Machines, Welding Equipment, Compressors, Generators, Pumps, Conveyor Systems, Packaging Machines, Printing Machines, Woodworking, Construction Equipment, Agricultural Machinery, Other
+**File:** `lib/core/constants/app_constants.dart`
 
-### Machine Conditions
+| Constant | Values |
+|----------|--------|
+| Categories | CNC Machines, Lathes, Milling Machines, Drilling Machines, Grinding Machines, Welding Equipment, Compressors, Generators, Pumps, Conveyor Systems, Packaging Machines, Printing Machines, Woodworking, Construction Equipment, Agricultural Machinery, Other |
+| Conditions | New, Used, Refurbished |
+| Sort Options | Newest First, Price: Low to High, Price: High to Low |
+| maxImages | 8 |
+| listingsPageSize | 20 |
 
-New, Like New, Good, Fair, For Parts
+**File:** `lib/core/constants/firebase_constants.dart`
+
+| Constant | Value |
+|----------|-------|
+| usersCollection | `'users'` |
+| listingsCollection | `'listings'` |
+| conversationsCollection | `'conversations'` |
+| machineImagesPath | `'machine_images'` |
+| avatarImagesPath | `'avatars'` |
+
+### Currency
+
+All prices are in **DZD** (Algerian Dinar). Display format: `150,000 DZD`
 
 ---
 
@@ -1010,10 +1345,13 @@ dependencies:
   carousel_slider: ^5.0.0
   image_picker: ^1.0.7
   intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   build_runner: ^2.4.0
   stacked_generator: ^1.6.0
+  flutter_lints: ^4.0.0
 ```
 
 ---
@@ -1047,4 +1385,9 @@ Dependency direction:
   Views → ViewModels → Services → Repositories → External SDKs
                           ↓
                        Models (shared across all layers except Views)
+
+Form pattern:
+  ViewModel holds plain strings + setters
+  View uses onChanged callbacks + static GlobalKey<FormState>
+  NEVER create TextEditingController inside builder()
 ```

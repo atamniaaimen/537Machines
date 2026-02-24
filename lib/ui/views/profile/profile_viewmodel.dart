@@ -9,10 +9,12 @@ import '../../../models/app_user.dart';
 import '../../../models/machine_listing.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/listing_service.dart';
+import '../../../services/favorite_service.dart';
 
 class ProfileViewModel extends ReactiveViewModel {
   final _authService = locator<AuthService>();
   final _listingService = locator<ListingService>();
+  final _favoriteService = locator<FavoriteService>();
   final _navigationService = locator<NavigationService>();
   final _crashlytics = locator<CrashlyticsService>();
 
@@ -24,9 +26,21 @@ class ProfileViewModel extends ReactiveViewModel {
   List<MachineListing> _myListings = [];
   List<MachineListing> get myListings => _myListings;
 
+  List<MachineListing> _savedListings = [];
+  List<MachineListing> get savedListings => _savedListings;
+
+  int _tabIndex = 0;
+  int get tabIndex => _tabIndex;
+
+  void setTabIndex(int index) {
+    _tabIndex = index;
+    rebuildUi();
+  }
+
   Future<void> init() async {
     if (currentUser == null) return;
     await _loadMyListings();
+    _loadSavedListings();
   }
 
   Future<void> _loadMyListings() async {
@@ -55,6 +69,42 @@ class ProfileViewModel extends ReactiveViewModel {
             ));
   }
 
+  Future<void> _loadSavedListings() async {
+    if (currentUser == null) return;
+
+    await Executor.run(_favoriteService.getFavoriteIds(currentUser!.uid))
+        .then((result) => result.fold(
+              (failure) {
+                _crashlytics.logToCrashlytics(
+                    Level.warning,
+                    [
+                      'ProfileViewModel',
+                      '_loadSavedListings()',
+                      failure.toString()
+                    ],
+                    failure.stackTrace);
+              },
+              (ids) async {
+                if (ids.isEmpty) {
+                  _savedListings = [];
+                  rebuildUi();
+                  return;
+                }
+                // Load each favorited listing
+                final listings = <MachineListing>[];
+                for (final id in ids) {
+                  await Executor.run(_listingService.getListingById(id))
+                      .then((result) => result.fold(
+                            (failure) {}, // Skip failed ones
+                            (listing) => listings.add(listing),
+                          ));
+                }
+                _savedListings = listings;
+                rebuildUi();
+              },
+            ));
+  }
+
   void navigateToEditProfile() {
     _navigationService.navigateTo(Routes.editProfileView);
   }
@@ -68,6 +118,10 @@ class ProfileViewModel extends ReactiveViewModel {
 
   void navigateToCreateListing() {
     _navigationService.navigateTo(Routes.createListingView);
+  }
+
+  void navigateToSettings() {
+    _navigationService.navigateTo(Routes.settingsView);
   }
 
   Future<void> signOut() async {

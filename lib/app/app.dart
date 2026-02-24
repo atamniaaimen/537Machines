@@ -14,6 +14,9 @@ import '../ui/views/profile/profile_view.dart';
 import '../ui/views/edit_profile/edit_profile_view.dart';
 import '../ui/views/search/search_view.dart';
 import '../ui/views/messages/messages_view.dart';
+import '../ui/views/home/home_view.dart';
+import '../ui/views/settings/settings_view.dart';
+import '../ui/views/notifications/notifications_view.dart';
 
 // Repositories (primitive adapters — try-catch layer)
 import '../repositories/firestore_repository.dart';
@@ -25,6 +28,10 @@ import '../services/auth_service.dart';
 import '../services/listing_service.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
+import '../services/notification_service.dart';
+import '../services/message_service.dart';
+import '../services/favorite_service.dart';
+import '../services/offer_service.dart';
 
 // Core services
 import '../core/services/crashlytics_service.dart';
@@ -49,6 +56,9 @@ import '../ui/bottom_sheets/filter/filter_sheet.dart';
     MaterialRoute(page: EditProfileView),
     MaterialRoute(page: SearchView),
     MaterialRoute(page: MessagesView),
+    MaterialRoute(page: HomeView),
+    MaterialRoute(page: SettingsView),
+    MaterialRoute(page: NotificationsView),
   ],
   dependencies: [
     // --- Stacked built-in services ---
@@ -70,6 +80,10 @@ import '../ui/bottom_sheets/filter/filter_sheet.dart';
     LazySingleton(classType: ListingService),
     LazySingleton(classType: StorageService),
     LazySingleton(classType: UserService),
+    LazySingleton(classType: NotificationService),
+    LazySingleton(classType: MessageService),
+    LazySingleton(classType: FavoriteService),
+    LazySingleton(classType: OfferService),
   ],
   dialogs: [
     StackedDialog(classType: ConfirmDialog),

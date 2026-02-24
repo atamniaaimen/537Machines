@@ -33,6 +33,45 @@ class AuthService with ListenableServiceMixin {
               },
               (credential) async {
                 await _loadUserDoc(credential.user!.uid);
+
+                // If no Firestore doc, create one
+                if (_currentUser.value == null) {
+                  final firebaseUser = credential.user!;
+                  final nameParts =
+                      (firebaseUser.displayName ?? '').split(' ');
+                  final user = AppUser(
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email ?? '',
+                    firstName:
+                        nameParts.isNotEmpty ? nameParts.first : '',
+                    lastName: nameParts.length > 1
+                        ? nameParts.sublist(1).join(' ')
+                        : '',
+                    photoUrl: firebaseUser.photoURL ?? '',
+                    createdAt: DateTime.now(),
+                  );
+
+                  await Executor.run(_firestoreRepo.setDocument(
+                    collection: FirebaseConstants.usersCollection,
+                    id: firebaseUser.uid,
+                    data: user.toJson(),
+                  )).then((result) => result.fold(
+                        (failure) {
+                          _crashlytics.logToCrashlytics(
+                              Level.warning,
+                              [
+                                'AuthService',
+                                'signIn(createDoc)',
+                                failure.toString()
+                              ],
+                              failure.stackTrace);
+                          throw failure;
+                        },
+                        (_) {
+                          _currentUser.value = user;
+                        },
+                      ));
+                }
               },
             ));
   }
@@ -162,6 +201,40 @@ class AuthService with ListenableServiceMixin {
     final firebaseUser = _authRepo.currentUser;
     if (firebaseUser == null) return;
     await _loadUserDoc(firebaseUser.uid);
+
+    // If Firestore doc didn't exist, create one from Firebase Auth data
+    if (_currentUser.value == null) {
+      final nameParts = (firebaseUser.displayName ?? '').split(' ');
+      final user = AppUser(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        firstName: nameParts.isNotEmpty ? nameParts.first : '',
+        lastName:
+            nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '',
+        photoUrl: firebaseUser.photoURL ?? '',
+        createdAt: DateTime.now(),
+      );
+
+      await Executor.run(_firestoreRepo.setDocument(
+        collection: FirebaseConstants.usersCollection,
+        id: firebaseUser.uid,
+        data: user.toJson(),
+      )).then((result) => result.fold(
+            (failure) {
+              _crashlytics.logToCrashlytics(
+                  Level.warning,
+                  [
+                    'AuthService',
+                    'tryAutoLogin(createDoc)',
+                    failure.toString()
+                  ],
+                  failure.stackTrace);
+            },
+            (_) {
+              _currentUser.value = user;
+            },
+          ));
+    }
   }
 
   Future<void> _loadUserDoc(String uid) {

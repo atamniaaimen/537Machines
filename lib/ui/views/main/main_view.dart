@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
 import '../../common/app_colors.dart';
+import '../home/home_view.dart';
 import '../listings/listings_view.dart';
-import '../search/search_view.dart';
+
 import '../create_listing/create_listing_view.dart';
 import '../messages/messages_view.dart';
 import '../profile/profile_view.dart';
+import '../../widgets/app_drawer.dart';
 import 'main_viewmodel.dart';
 
 class MainView extends StackedView<MainViewModel> {
@@ -19,6 +21,41 @@ class MainView extends StackedView<MainViewModel> {
     Widget? child,
   ) {
     return Scaffold(
+      drawer: AppDrawer(
+        user: viewModel.currentUser,
+        onHome: () {
+          Navigator.of(context).pop();
+          viewModel.setIndex(0);
+        },
+        onBrowse: () {
+          Navigator.of(context).pop();
+          viewModel.setIndex(1);
+        },
+        onSell: () {
+          Navigator.of(context).pop();
+          viewModel.setIndex(2);
+        },
+        onMessages: () {
+          Navigator.of(context).pop();
+          viewModel.setIndex(3);
+        },
+        onProfile: () {
+          Navigator.of(context).pop();
+          viewModel.setIndex(4);
+        },
+        onSettings: () {
+          Navigator.of(context).pop();
+          viewModel.navigateToSettings();
+        },
+        onNotifications: () {
+          Navigator.of(context).pop();
+          viewModel.navigateToNotifications();
+        },
+        onSignOut: () {
+          Navigator.of(context).pop();
+          viewModel.signOut();
+        },
+      ),
       body: _getViewForIndex(viewModel.currentIndex),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -48,7 +85,7 @@ class MainView extends StackedView<MainViewModel> {
                 _NavItem(
                   icon: Icons.search_outlined,
                   activeIcon: Icons.search,
-                  label: 'Search',
+                  label: 'Browse',
                   isActive: viewModel.currentIndex == 1,
                   onTap: () => viewModel.setIndex(1),
                 ),
@@ -84,9 +121,9 @@ class MainView extends StackedView<MainViewModel> {
   Widget _getViewForIndex(int index) {
     switch (index) {
       case 0:
-        return const ListingsView();
+        return const HomeView();
       case 1:
-        return const SearchView();
+        return const ListingsView();
       case 2:
         return const CreateListingView();
       case 3:

@@ -16,6 +16,10 @@ class MachineListing {
   final int? year;
   final int? hours;
   final List<String> imageUrls;
+  final String status; // 'active', 'sold', 'paused'
+  final bool isNegotiable;
+  final bool acceptsOffers;
+  final String serialNumber;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -35,6 +39,10 @@ class MachineListing {
     this.year,
     this.hours,
     this.imageUrls = const [],
+    this.status = 'active',
+    this.isNegotiable = false,
+    this.acceptsOffers = true,
+    this.serialNumber = '',
     required this.createdAt,
     required this.updatedAt,
   }) : titleLowercase = titleLowercase ?? '';
@@ -56,6 +64,10 @@ class MachineListing {
       year: json['year'] as int?,
       hours: json['hours'] as int?,
       imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      status: json['status'] ?? 'active',
+      isNegotiable: json['isNegotiable'] ?? false,
+      acceptsOffers: json['acceptsOffers'] ?? true,
+      serialNumber: json['serialNumber'] ?? '',
       createdAt: json['createdAt'] is Timestamp
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
@@ -83,6 +95,10 @@ class MachineListing {
       'year': year,
       'hours': hours,
       'imageUrls': imageUrls,
+      'status': status,
+      'isNegotiable': isNegotiable,
+      'acceptsOffers': acceptsOffers,
+      'serialNumber': serialNumber,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -103,6 +119,10 @@ class MachineListing {
     int? year,
     int? hours,
     List<String>? imageUrls,
+    String? status,
+    bool? isNegotiable,
+    bool? acceptsOffers,
+    String? serialNumber,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool clearYear = false,
@@ -124,6 +144,10 @@ class MachineListing {
       year: clearYear ? null : (year ?? this.year),
       hours: clearHours ? null : (hours ?? this.hours),
       imageUrls: imageUrls ?? this.imageUrls,
+      status: status ?? this.status,
+      isNegotiable: isNegotiable ?? this.isNegotiable,
+      acceptsOffers: acceptsOffers ?? this.acceptsOffers,
+      serialNumber: serialNumber ?? this.serialNumber,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

@@ -19,7 +19,7 @@ class SearchView extends StackedView<SearchViewModel> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search, size: 64, color: AppColors.gray300),
+            const Icon(Icons.search, size: 64, color: AppColors.gray300),
             const SizedBox(height: 16),
             Text(
               'Search',

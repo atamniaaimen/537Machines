@@ -39,7 +39,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
                     IconButton(
                       icon: const Icon(Icons.settings_outlined,
                           color: AppColors.gray400),
-                      onPressed: viewModel.signOut,
+                      onPressed: viewModel.navigateToSettings,
                     ),
                     const SizedBox(width: 8),
                   ],
@@ -113,15 +113,28 @@ class ProfileView extends StackedView<ProfileViewModel> {
                   child: Container(height: 1, color: AppColors.gray150),
                 ),
 
-                // My Listings header
+                // Tabs: My Listings / Saved
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
-                    child: Text('MY LISTINGS', style: AppTextStyles.sectionLabel),
+                  child: Container(
+                    color: AppColors.surface,
+                    child: Row(
+                      children: [
+                        _TabButton(
+                          label: 'MY LISTINGS',
+                          isActive: viewModel.tabIndex == 0,
+                          onTap: () => viewModel.setTabIndex(0),
+                        ),
+                        _TabButton(
+                          label: 'SAVED',
+                          isActive: viewModel.tabIndex == 1,
+                          onTap: () => viewModel.setTabIndex(1),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
-                // Listings grid or empty state
+                // Tab content
                 if (viewModel.isBusy)
                   const SliverToBoxAdapter(
                     child: Padding(
@@ -129,47 +142,93 @@ class ProfileView extends StackedView<ProfileViewModel> {
                       child: LoadingIndicator(),
                     ),
                   )
-                else if (viewModel.myListings.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(48),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.inventory_2_outlined,
-                              size: 48, color: AppColors.gray300),
-                          verticalSpaceSmall,
-                          Text(
-                            'No listings yet',
-                            style: AppTextStyles.bodySmall,
-                          ),
-                        ],
+                else if (viewModel.tabIndex == 0) ...[
+                  // My Listings
+                  if (viewModel.myListings.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(48),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.inventory_2_outlined,
+                                size: 48, color: AppColors.gray300),
+                            verticalSpaceSmall,
+                            Text(
+                              'No listings yet',
+                              style: AppTextStyles.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final listing = viewModel.myListings[index];
+                            return MachineCard(
+                              listing: listing,
+                              onTap: () =>
+                                  viewModel.openListingDetail(listing.id),
+                            );
+                          },
+                          childCount: viewModel.myListings.length,
+                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.68,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
                       ),
                     ),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverGrid(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final listing = viewModel.myListings[index];
-                          return MachineCard(
-                            listing: listing,
-                            onTap: () =>
-                                viewModel.openListingDetail(listing.id),
-                          );
-                        },
-                        childCount: viewModel.myListings.length,
+                ] else ...[
+                  // Saved
+                  if (viewModel.savedListings.isEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(48),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.favorite_border,
+                                size: 48, color: AppColors.gray300),
+                            verticalSpaceSmall,
+                            Text(
+                              'No saved listings yet',
+                              style: AppTextStyles.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.68,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final listing = viewModel.savedListings[index];
+                            return MachineCard(
+                              listing: listing,
+                              onTap: () =>
+                                  viewModel.openListingDetail(listing.id),
+                            );
+                          },
+                          childCount: viewModel.savedListings.length,
+                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.68,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
                       ),
                     ),
-                  ),
+                ],
 
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
               ],
@@ -183,6 +242,46 @@ class ProfileView extends StackedView<ProfileViewModel> {
 
   @override
   void onViewModelReady(ProfileViewModel viewModel) => viewModel.init();
+}
+
+class _TabButton extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _TabButton({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isActive ? AppColors.primaryDark : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.sectionLabel.copyWith(
+              fontSize: 11,
+              color: isActive ? AppColors.primaryDark : AppColors.gray400,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _StatItem extends StatelessWidget {

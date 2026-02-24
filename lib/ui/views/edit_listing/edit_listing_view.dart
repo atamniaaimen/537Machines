@@ -16,6 +16,8 @@ class EditListingView extends StackedView<EditListingViewModel> {
 
   const EditListingView({required this.listingId, super.key});
 
+  static final _formKey = GlobalKey<FormState>();
+
   @override
   Widget builder(
     BuildContext context,
@@ -43,17 +45,6 @@ class EditListingView extends StackedView<EditListingViewModel> {
       );
     }
 
-    final listing = viewModel.listing!;
-    final titleController = TextEditingController(text: listing.title);
-    final brandController = TextEditingController(text: listing.brand);
-    final modelController = TextEditingController(text: listing.model);
-    final yearController = TextEditingController(text: listing.year?.toString() ?? '');
-    final hoursController = TextEditingController(text: listing.hours?.toString() ?? '');
-    final priceController = TextEditingController(text: listing.price.toStringAsFixed(0));
-    final locationController = TextEditingController(text: listing.location);
-    final descriptionController = TextEditingController(text: listing.description);
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -70,7 +61,7 @@ class EditListingView extends StackedView<EditListingViewModel> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
-          key: formKey,
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -83,10 +74,7 @@ class EditListingView extends StackedView<EditListingViewModel> {
                   scrollDirection: Axis.horizontal,
                   children: [
                     // Existing remote images
-                    ...viewModel.existingImageUrls
-                        .asMap()
-                        .entries
-                        .map((entry) {
+                    ...viewModel.existingImageUrls.asMap().entries.map((entry) {
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Stack(
@@ -189,8 +177,9 @@ class EditListingView extends StackedView<EditListingViewModel> {
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: titleController,
+                initialValue: viewModel.title,
                 label: 'Title',
+                onChanged: viewModel.setTitle,
                 validator: (v) => Validators.validateRequired(v, 'Title'),
               ),
               verticalSpaceMedium,
@@ -200,17 +189,19 @@ class EditListingView extends StackedView<EditListingViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: brandController,
+                      initialValue: viewModel.brand,
                       label: 'Brand',
                       hint: 'e.g. Haas',
+                      onChanged: viewModel.setBrand,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      controller: modelController,
+                      initialValue: viewModel.model,
                       label: 'Model',
                       hint: 'e.g. VF-2',
+                      onChanged: viewModel.setModel,
                     ),
                   ),
                 ],
@@ -222,10 +213,11 @@ class EditListingView extends StackedView<EditListingViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: yearController,
+                      initialValue: viewModel.year,
                       label: 'Year',
                       hint: 'e.g. 2020',
                       keyboardType: TextInputType.number,
+                      onChanged: viewModel.setYear,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -246,10 +238,11 @@ class EditListingView extends StackedView<EditListingViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: hoursController,
+                      initialValue: viewModel.hours,
                       label: 'Hours',
                       hint: 'e.g. 5000',
                       keyboardType: TextInputType.number,
+                      onChanged: viewModel.setHours,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -266,27 +259,28 @@ class EditListingView extends StackedView<EditListingViewModel> {
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: priceController,
-                label: 'Price (\$)',
+                initialValue: viewModel.price,
+                label: 'Price (DZD)',
                 keyboardType: TextInputType.number,
+                onChanged: viewModel.setPrice,
                 validator: Validators.validatePrice,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: locationController,
+                initialValue: viewModel.location,
                 label: 'Location',
-                validator: (v) =>
-                    Validators.validateRequired(v, 'Location'),
+                onChanged: viewModel.setLocation,
+                validator: (v) => Validators.validateRequired(v, 'Location'),
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: descriptionController,
+                initialValue: viewModel.description,
                 label: 'Description',
                 maxLines: 4,
-                validator: (v) =>
-                    Validators.validateRequired(v, 'Description'),
+                onChanged: viewModel.setDescription,
+                validator: (v) => Validators.validateRequired(v, 'Description'),
               ),
 
               verticalSpaceLarge,
@@ -311,17 +305,8 @@ class EditListingView extends StackedView<EditListingViewModel> {
                       size: ButtonSize.lg,
                       isLoading: viewModel.isBusy,
                       onTap: () {
-                        if (formKey.currentState!.validate()) {
-                          viewModel.submit(
-                            title: titleController.text.trim(),
-                            brand: brandController.text.trim(),
-                            model: modelController.text.trim(),
-                            year: yearController.text.trim(),
-                            hours: hoursController.text.trim(),
-                            description: descriptionController.text.trim(),
-                            price: priceController.text.trim(),
-                            location: locationController.text.trim(),
-                          );
+                        if (_formKey.currentState!.validate()) {
+                          viewModel.submit();
                         }
                       },
                     ),
@@ -393,13 +378,11 @@ class _StyledDropdown extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  const BorderSide(color: AppColors.danger, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  const BorderSide(color: AppColors.danger, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
             ),
           ),
           items: items.map((c) {

@@ -12,21 +12,14 @@ import 'create_listing_viewmodel.dart';
 class CreateListingView extends StackedView<CreateListingViewModel> {
   const CreateListingView({super.key});
 
+  static final _formKey = GlobalKey<FormState>();
+
   @override
   Widget builder(
     BuildContext context,
     CreateListingViewModel viewModel,
     Widget? child,
   ) {
-    final titleController = TextEditingController();
-    final brandController = TextEditingController();
-    final modelController = TextEditingController();
-    final yearController = TextEditingController();
-    final priceController = TextEditingController();
-    final locationController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -43,7 +36,7 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
-          key: formKey,
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -165,9 +158,9 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: titleController,
                 label: 'Title',
                 hint: 'e.g. CNC Milling Machine',
+                onChanged: viewModel.setTitle,
                 validator: (v) => Validators.validateRequired(v, 'Title'),
               ),
               verticalSpaceMedium,
@@ -177,17 +170,17 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: brandController,
                       label: 'Brand',
                       hint: 'e.g. Haas',
+                      onChanged: viewModel.setBrand,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      controller: modelController,
                       label: 'Model',
                       hint: 'e.g. VF-2',
+                      onChanged: viewModel.setModel,
                     ),
                   ),
                 ],
@@ -199,10 +192,10 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      controller: yearController,
                       label: 'Year',
                       hint: 'e.g. 2020',
                       keyboardType: TextInputType.number,
+                      onChanged: viewModel.setYear,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -221,27 +214,27 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: priceController,
-                label: 'Price (\$)',
+                label: 'Price (DZD)',
                 hint: 'Enter price',
                 keyboardType: TextInputType.number,
+                onChanged: viewModel.setPrice,
                 validator: Validators.validatePrice,
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: locationController,
                 label: 'Location',
                 hint: 'e.g. New York, NY',
+                onChanged: viewModel.setLocation,
                 validator: (v) => Validators.validateRequired(v, 'Location'),
               ),
               verticalSpaceMedium,
 
               CustomTextField(
-                controller: descriptionController,
                 label: 'Description',
                 hint: 'Describe the machine, its features, and condition...',
                 maxLines: 4,
+                onChanged: viewModel.setDescription,
                 validator: (v) =>
                     Validators.validateRequired(v, 'Description'),
               ),
@@ -254,6 +247,27 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
                 onChanged: viewModel.setCategory,
                 validator: (v) =>
                     v == null ? 'Please select a category' : null,
+              ),
+              verticalSpaceMedium,
+
+              CustomTextField(
+                label: 'Serial Number',
+                hint: 'Optional — machine serial number',
+                onChanged: viewModel.setSerialNumber,
+              ),
+              verticalSpaceMedium,
+
+              // Toggles
+              _ToggleRow(
+                label: 'Price is negotiable',
+                value: viewModel.isNegotiable,
+                onChanged: viewModel.toggleNegotiable,
+              ),
+              const SizedBox(height: 8),
+              _ToggleRow(
+                label: 'Accept offers from buyers',
+                value: viewModel.acceptsOffers,
+                onChanged: viewModel.toggleAcceptsOffers,
               ),
 
               verticalSpaceLarge,
@@ -274,16 +288,8 @@ class CreateListingView extends StackedView<CreateListingViewModel> {
                 size: ButtonSize.lg,
                 isLoading: viewModel.isBusy,
                 onTap: () {
-                  if (formKey.currentState!.validate()) {
-                    viewModel.submit(
-                      title: titleController.text.trim(),
-                      brand: brandController.text.trim(),
-                      model: modelController.text.trim(),
-                      year: yearController.text.trim(),
-                      description: descriptionController.text.trim(),
-                      price: priceController.text.trim(),
-                      location: locationController.text.trim(),
-                    );
+                  if (_formKey.currentState!.validate()) {
+                    viewModel.submit();
                   }
                 },
               ),
@@ -402,4 +408,46 @@ class _DashedBorderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _ToggleRow extends StatelessWidget {
+  final String label;
+  final bool value;
+  final VoidCallback onChanged;
+
+  const _ToggleRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onChanged,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.gray200),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: AppTextStyles.body.copyWith(fontSize: 14),
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: (_) => onChanged(),
+              activeColor: AppColors.primaryDark,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

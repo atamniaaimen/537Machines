@@ -62,8 +62,7 @@ class MachineCard extends StatelessWidget {
                       color: AppColors.gray100,
                       child: Center(
                         child: Icon(Icons.precision_manufacturing,
-                            size: 40,
-                            color: AppColors.dark.withOpacity(0.15)),
+                            size: 40, color: AppColors.dark.withOpacity(0.15)),
                       ),
                     ),
                   // Condition badge
@@ -77,61 +76,64 @@ class MachineCard extends StatelessWidget {
               ),
             ),
             // Body
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    listing.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.titilliumWeb(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.dark,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${_formatPrice(listing.price)}',
-                    style: GoogleFonts.titilliumWeb(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on_outlined,
-                          size: 14, color: AppColors.gray400),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          listing.location,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.titilliumWeb(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                            color: AppColors.gray400,
-                          ),
-                        ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      listing.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.titilliumWeb(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.dark,
+                        height: 1.3,
                       ),
-                      if (listing.year != null)
-                        Text(
-                          '${listing.year}',
-                          style: GoogleFonts.titilliumWeb(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                            color: AppColors.gray400,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_formatPrice(listing.price)} DZD',
+                      style: GoogleFonts.titilliumWeb(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined,
+                            size: 14, color: AppColors.gray400),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            listing.location,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.titilliumWeb(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: AppColors.gray400,
+                            ),
                           ),
                         ),
-                    ],
-                  ),
-                ],
+                        if (listing.year != null)
+                          Text(
+                            '${listing.year}',
+                            style: GoogleFonts.titilliumWeb(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: AppColors.gray400,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

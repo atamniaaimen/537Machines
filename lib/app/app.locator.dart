@@ -17,7 +17,11 @@ import '../repositories/auth_repository.dart';
 import '../repositories/firestore_repository.dart';
 import '../repositories/storage_repository.dart';
 import '../services/auth_service.dart';
+import '../services/favorite_service.dart';
 import '../services/listing_service.dart';
+import '../services/message_service.dart';
+import '../services/notification_service.dart';
+import '../services/offer_service.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 
@@ -44,4 +48,8 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => ListingService());
   locator.registerLazySingleton(() => StorageService());
   locator.registerLazySingleton(() => UserService());
+  locator.registerLazySingleton(() => NotificationService());
+  locator.registerLazySingleton(() => MessageService());
+  locator.registerLazySingleton(() => FavoriteService());
+  locator.registerLazySingleton(() => OfferService());
 }

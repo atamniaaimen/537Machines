@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../common/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
+  final String? initialValue;
   final String label;
   final String? hint;
   final String? Function(String?)? validator;
@@ -16,7 +17,8 @@ class CustomTextField extends StatelessWidget {
   final void Function(String)? onChanged;
 
   const CustomTextField({
-    required this.controller,
+    this.controller,
+    this.initialValue,
     required this.label,
     this.hint,
     this.validator,
@@ -48,6 +50,7 @@ class CustomTextField extends StatelessWidget {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
+          initialValue: controller == null ? initialValue : null,
           validator: validator,
           obscureText: obscureText,
           keyboardType: keyboardType,

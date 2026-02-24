@@ -44,6 +44,34 @@ class EditListingViewModel extends BaseViewModel {
   String? _selectedCondition;
   String? get selectedCondition => _selectedCondition;
 
+  // Form values as plain strings
+  String _title = '';
+  String _brand = '';
+  String _model = '';
+  String _year = '';
+  String _hours = '';
+  String _price = '';
+  String _location = '';
+  String _description = '';
+
+  String get title => _title;
+  String get brand => _brand;
+  String get model => _model;
+  String get year => _year;
+  String get hours => _hours;
+  String get price => _price;
+  String get location => _location;
+  String get description => _description;
+
+  void setTitle(String v) => _title = v;
+  void setBrand(String v) => _brand = v;
+  void setModel(String v) => _model = v;
+  void setYear(String v) => _year = v;
+  void setHours(String v) => _hours = v;
+  void setPrice(String v) => _price = v;
+  void setLocation(String v) => _location = v;
+  void setDescription(String v) => _description = v;
+
   Future<void> init() async {
     setBusy(true);
 
@@ -66,6 +94,14 @@ class EditListingViewModel extends BaseViewModel {
                 _existingImageUrls = List.from(data.imageUrls);
                 _selectedCategory = data.category;
                 _selectedCondition = data.condition;
+                _title = data.title;
+                _brand = data.brand;
+                _model = data.model;
+                _year = data.year?.toString() ?? '';
+                _hours = data.hours?.toString() ?? '';
+                _price = data.price.toStringAsFixed(0);
+                _location = data.location;
+                _description = data.description;
                 setBusy(false);
                 rebuildUi();
               },
@@ -156,16 +192,7 @@ class EditListingViewModel extends BaseViewModel {
             ));
   }
 
-  Future<void> submit({
-    required String title,
-    required String brand,
-    required String model,
-    required String year,
-    required String hours,
-    required String description,
-    required String price,
-    required String location,
-  }) async {
+  Future<void> submit() async {
     setBusy(true);
 
     final user = _authService.currentUser;
@@ -203,19 +230,19 @@ class EditListingViewModel extends BaseViewModel {
       if (hasError) return;
     }
 
-    final parsedYear = int.tryParse(year);
-    final parsedHours = int.tryParse(hours);
+    final parsedYear = int.tryParse(_year.trim());
+    final parsedHours = int.tryParse(_hours.trim());
 
     final updated = _listing!.copyWith(
-      title: title,
-      description: description,
+      title: _title.trim(),
+      description: _description.trim(),
       category: _selectedCategory,
-      price: double.tryParse(price),
+      price: double.tryParse(_price.trim()),
       condition: _selectedCondition,
-      location: location,
+      location: _location.trim(),
       imageUrls: allImageUrls,
-      brand: brand,
-      model: model,
+      brand: _brand.trim(),
+      model: _model.trim(),
       year: parsedYear,
       clearYear: parsedYear == null && _listing!.year != null,
       hours: parsedHours,

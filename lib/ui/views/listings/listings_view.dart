@@ -33,7 +33,7 @@ class ListingsView extends StackedView<ListingsViewModel> {
                   const LogoWidget(size: LogoSize.sm),
                   Row(
                     children: [
-                      Icon(Icons.notifications_outlined,
+                      const Icon(Icons.notifications_outlined,
                           size: 22, color: AppColors.gray500),
                       const SizedBox(width: 12),
                       AvatarWidget(
@@ -88,8 +88,7 @@ class ListingsView extends StackedView<ListingsViewModel> {
                                 color: AppColors.dark,
                               ),
                               decoration: InputDecoration(
-                                hintText:
-                                    'Search machines, brands, models...',
+                                hintText: 'Search machines, brands, models...',
                                 hintStyle: GoogleFonts.titilliumWeb(
                                   fontSize: 15,
                                   color: AppColors.gray300,
@@ -151,15 +150,13 @@ class ListingsView extends StackedView<ListingsViewModel> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: viewModel.categoryTags.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 8),
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
                           itemBuilder: (context, index) {
                             final tag = viewModel.categoryTags[index];
                             final isSelected =
                                 tag == viewModel.selectedCategoryTag;
                             return GestureDetector(
-                              onTap: () =>
-                                  viewModel.selectCategoryTag(tag),
+                              onTap: () => viewModel.selectCategoryTag(tag),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 4),
@@ -191,8 +188,8 @@ class ListingsView extends StackedView<ListingsViewModel> {
                       if (viewModel.isBusy)
                         const Padding(
                           padding: EdgeInsets.only(top: 60),
-                          child: LoadingIndicator(
-                              message: 'Loading machines...'),
+                          child:
+                              LoadingIndicator(message: 'Loading machines...'),
                         )
                       else if (viewModel.hasError)
                         _buildError(viewModel)
@@ -216,7 +213,7 @@ class ListingsView extends StackedView<ListingsViewModel> {
       child: Column(
         children: [
           const SizedBox(height: 60),
-          Icon(Icons.error_outline, size: 48, color: AppColors.gray300),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.gray300),
           const SizedBox(height: 16),
           Text(
             viewModel.modelError.toString(),
@@ -246,7 +243,7 @@ class ListingsView extends StackedView<ListingsViewModel> {
       child: Column(
         children: [
           const SizedBox(height: 60),
-          Icon(Icons.inventory_2_outlined,
+          const Icon(Icons.inventory_2_outlined,
               size: 48, color: AppColors.gray300),
           const SizedBox(height: 16),
           Text(

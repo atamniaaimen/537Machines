@@ -11,16 +11,14 @@ import 'login_viewmodel.dart';
 class LoginView extends StackedView<LoginViewModel> {
   const LoginView({super.key});
 
+  static final _formKey = GlobalKey<FormState>();
+
   @override
   Widget builder(
     BuildContext context,
     LoginViewModel viewModel,
     Widget? child,
   ) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
     return Scaffold(
       backgroundColor: AppColors.gray50,
       body: Center(
@@ -42,7 +40,7 @@ class LoginView extends StackedView<LoginViewModel> {
               ],
             ),
             child: Form(
-              key: formKey,
+              key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -93,15 +91,14 @@ class LoginView extends StackedView<LoginViewModel> {
 
                   // Fields
                   CustomTextField(
-                    controller: emailController,
                     label: 'Email',
                     hint: 'you@company.com',
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: viewModel.setEmail,
                     validator: Validators.validateEmail,
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
-                    controller: passwordController,
                     label: 'Password',
                     hint: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
                     obscureText: viewModel.obscurePassword,
@@ -115,6 +112,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       ),
                       onPressed: viewModel.togglePasswordVisibility,
                     ),
+                    onChanged: viewModel.setPassword,
                     validator: Validators.validatePassword,
                   ),
 
@@ -140,11 +138,8 @@ class LoginView extends StackedView<LoginViewModel> {
                     size: ButtonSize.lg,
                     isLoading: viewModel.isBusy,
                     onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        viewModel.signIn(
-                          emailController.text.trim(),
-                          passwordController.text,
-                        );
+                      if (_formKey.currentState!.validate()) {
+                        viewModel.signIn();
                       }
                     },
                   ),
